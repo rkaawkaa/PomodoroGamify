@@ -1,7 +1,10 @@
+export type Locale = 'en' | 'fr';
+
 export interface User {
     id: number;
     name: string;
     email: string;
+    locale: Locale;
     email_verified_at?: string;
 }
 
@@ -11,4 +14,6 @@ export type PageProps<
     auth: {
         user: User;
     };
+    locale: Locale;
+    translations: Record<string, string>;
 };
