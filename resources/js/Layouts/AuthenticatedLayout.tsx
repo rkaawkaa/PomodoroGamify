@@ -1,12 +1,15 @@
 import AppLogo from '@/Components/AppLogo';
 import LocaleSwitcher from '@/Components/LocaleSwitcher';
+import UserMenu from '@/Components/UserMenu';
 import { useTranslation } from '@/hooks/useTranslation';
-import { PageProps } from '@/types';
-import { Link, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 
-export default function AuthenticatedLayout({ children }: PropsWithChildren) {
-    const { auth } = usePage<PageProps>().props;
+interface Props extends PropsWithChildren {
+    onManage?: () => void;
+}
+
+export default function AuthenticatedLayout({ children, onManage }: Props) {
     const { t } = useTranslation();
 
     return (
@@ -25,18 +28,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
 
                     <div className="flex items-center gap-4">
                         <LocaleSwitcher />
-                        <span className="text-boundary select-none">|</span>
-                        <span className="text-sm text-whisper">
-                            {auth.user.name}
-                        </span>
-                        <Link
-                            href={route('logout')}
-                            method="post"
-                            as="button"
-                            className="text-sm text-whisper transition-colors hover:text-moonbeam"
-                        >
-                            {t('nav.logout')}
-                        </Link>
+                        <span className="select-none text-boundary">|</span>
+                        <UserMenu onManage={onManage ?? (() => {})} />
                     </div>
                 </div>
             </nav>

@@ -6,17 +6,22 @@ import { PropsWithChildren } from 'react';
 
 export default function GuestLayout({ children }: PropsWithChildren) {
     return (
-        <div className="relative min-h-screen overflow-hidden bg-abyss flex items-center justify-center px-4 py-12">
+        <div className="relative min-h-screen bg-abyss flex flex-col">
 
-            {/* Ambient glow — subtil, ne distrait pas */}
+            {/* Ambient glow */}
             <div
                 aria-hidden
                 className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-ember opacity-[0.035] blur-[110px]"
             />
 
-            <LocaleSwitcher className="absolute top-4 right-4 z-20" />
+            {/* Top bar — locale switcher always top-right, no positioning magic */}
+            <div className="relative z-10 flex justify-end px-6 pt-5">
+                <LocaleSwitcher />
+            </div>
 
-        <div className="relative z-10 w-full max-w-sm">
+            {/* Centered content */}
+            <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm">
 
                 {/* Brand */}
                 <motion.div
@@ -52,6 +57,7 @@ export default function GuestLayout({ children }: PropsWithChildren) {
                     <div className="p-8">{children}</div>
                 </motion.div>
 
+            </div>
             </div>
         </div>
     );
