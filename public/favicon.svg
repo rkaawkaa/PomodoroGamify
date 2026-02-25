@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36">
+  <!-- Background -->
+  <rect width="36" height="36" rx="8" fill="#0F1019"/>
+
+  <!-- Timer arc ring — 300°, gap at 12 o'clock -->
+  <circle cx="18" cy="18" r="15.5" stroke="#DD554B" stroke-width="2" stroke-linecap="round"
+    stroke-dasharray="81.16 16.23" transform="rotate(-60, 18, 18)" fill="none"/>
+
+  <!-- 5 sakura petals rotated 72° apart -->
+  <ellipse cx="18" cy="12.2" rx="2.4" ry="3.8" fill="#DD554B" opacity="0.82" transform="rotate(0, 18, 18)"/>
+  <ellipse cx="18" cy="12.2" rx="2.4" ry="3.8" fill="#DD554B" opacity="0.82" transform="rotate(72, 18, 18)"/>
+  <ellipse cx="18" cy="12.2" rx="2.4" ry="3.8" fill="#DD554B" opacity="0.82" transform="rotate(144, 18, 18)"/>
+  <ellipse cx="18" cy="12.2" rx="2.4" ry="3.8" fill="#DD554B" opacity="0.82" transform="rotate(216, 18, 18)"/>
+  <ellipse cx="18" cy="12.2" rx="2.4" ry="3.8" fill="#DD554B" opacity="0.82" transform="rotate(288, 18, 18)"/>
+
+  <!-- Timer hand -->
+  <line x1="18" y1="18" x2="18" y2="13.5" stroke="#DD554B" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Center pivot -->
+  <circle cx="18" cy="18" r="1.8" fill="#DD554B"/>
+</svg>
