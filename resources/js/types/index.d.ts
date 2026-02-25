@@ -1,5 +1,24 @@
 export type Locale = 'en' | 'fr';
 
+export interface PomodoroSettings {
+    pomodoro_duration: number;
+    break_duration: number;
+    auto_start_breaks: boolean;
+    auto_start_pomodoros: boolean;
+}
+
+export interface Project {
+    id: number;
+    name: string;
+    is_active: boolean;
+}
+
+export interface Category {
+    id: number;
+    name: string;
+    is_active: boolean;
+}
+
 export interface User {
     id: number;
     name: string;

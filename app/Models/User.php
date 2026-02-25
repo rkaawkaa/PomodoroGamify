@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -22,6 +23,10 @@ class User extends Authenticatable
         'email',
         'password',
         'locale',
+        'pomodoro_duration',
+        'break_duration',
+        'auto_start_breaks',
+        'auto_start_pomodoros',
     ];
 
     /**
@@ -39,11 +44,30 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    public function pomodoroSessions(): HasMany
+    {
+        return $this->hasMany(PomodoroSession::class);
+    }
+
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'    => 'datetime',
+            'password'             => 'hashed',
+            'auto_start_breaks'    => 'boolean',
+            'auto_start_pomodoros' => 'boolean',
+            'pomodoro_duration'    => 'integer',
+            'break_duration'       => 'integer',
         ];
     }
 }
