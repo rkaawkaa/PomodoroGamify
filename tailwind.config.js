@@ -25,6 +25,7 @@ export default {
     			sm: 'calc(var(--radius) - 4px)'
     		},
     		colors: {
+    			/* shadcn/ui tokens */
     			background: 'hsl(var(--background))',
     			foreground: 'hsl(var(--foreground))',
     			card: {
@@ -64,7 +65,23 @@ export default {
     				'3': 'hsl(var(--chart-3))',
     				'4': 'hsl(var(--chart-4))',
     				'5': 'hsl(var(--chart-5))'
-    			}
+    			},
+    			/* Palette Nightbloom — utilise directement en classes Tailwind
+    			 * ex: bg-ember, text-sunbeam, border-boundary … */
+    			void:     'hsl(var(--void))',
+    			abyss:    'hsl(var(--abyss))',
+    			depth:    'hsl(var(--depth))',
+    			surface:  'hsl(var(--surface))',
+    			boundary: 'hsl(var(--boundary))',
+    			whisper:  'hsl(var(--whisper))',
+    			moonbeam: 'hsl(var(--moonbeam))',
+    			ember:    'hsl(var(--ember))',
+    			jade:     'hsl(var(--jade))',
+    			ocean:    'hsl(var(--ocean))',
+    			sunbeam:  'hsl(var(--sunbeam))',
+    			aurora:   'hsl(var(--aurora))',
+    			bloom:    'hsl(var(--bloom))',
+    			coral:    'hsl(var(--coral))',
     		}
     	}
     },
