@@ -118,6 +118,11 @@
     "mail.reset.expire": "Ce lien expire dans :count minutes.",
     "mail.reset.ignore": "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.",
 
+    "mail.changed.subject": "Votre mot de passe PomoBloom a été modifié",
+    "mail.changed.intro": "Votre mot de passe a bien été modifié avec succès.",
+    "mail.changed.cta": "Se connecter à mon compte",
+    "mail.changed.ignore": "Si vous n'êtes pas à l'origine de cette modification, sécurisez votre compte immédiatement.",
+
     "common.save": "Enregistrer",
     "common.cancel": "Annuler",
     "common.delete": "Supprimer",
