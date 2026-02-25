@@ -1,4 +1,5 @@
 import AppLogo from '@/Components/AppLogo';
+import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -23,6 +24,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
                     </Link>
 
                     <div className="flex items-center gap-4">
+                        <LocaleSwitcher />
+                        <span className="text-boundary select-none">|</span>
                         <span className="text-sm text-whisper">
                             {auth.user.name}
                         </span>

@@ -1,4 +1,5 @@
 import AppLogo from '@/Components/AppLogo';
+import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import { Link } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { PropsWithChildren } from 'react';
@@ -13,7 +14,9 @@ export default function GuestLayout({ children }: PropsWithChildren) {
                 className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-ember opacity-[0.035] blur-[110px]"
             />
 
-            <div className="relative z-10 w-full max-w-sm">
+            <LocaleSwitcher className="absolute top-4 right-4 z-20" />
+
+        <div className="relative z-10 w-full max-w-sm">
 
                 {/* Brand */}
                 <motion.div
