@@ -379,7 +379,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
         <AuthenticatedLayout onManage={() => setManageOpen(true)}>
             <Head title="Pomodoro" />
 
-            <div className="flex flex-1 flex-col items-center bg-gradient-to-b from-ember/[0.06] via-transparent to-bloom/[0.04] px-4 pt-8 pb-20">
+            <div className="flex flex-1 flex-col items-center bg-gradient-to-b from-ember/[0.10] via-transparent to-bloom/[0.07] px-4 pt-8 pb-20">
 
                 {/* Timer card — no overflow-hidden so dropdowns can escape */}
                 <div className="w-full max-w-xs rounded-3xl border border-whisper/10 bg-depth shadow-2xl shadow-black/70">
@@ -400,13 +400,8 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                             <button
                                 type="button"
                                 onClick={() => setSettingsOpen(true)}
-                                disabled={isFocus && isActive}
                                 title={t('settings.title')}
-                                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 transition-colors ${
-                                    isFocus && isActive
-                                        ? 'cursor-default border-boundary/30 bg-surface/20 text-whisper/30'
-                                        : 'border-boundary/60 bg-surface/60 text-whisper hover:border-whisper/40 hover:bg-surface hover:text-moonbeam'
-                                }`}
+                                className="flex items-center gap-1.5 rounded-full border border-boundary/60 bg-surface/60 px-2.5 py-1 text-whisper transition-colors hover:border-whisper/40 hover:bg-surface hover:text-moonbeam"
                             >
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                                     <circle cx="12" cy="12" r="3" />
@@ -585,13 +580,25 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                     onClose={() => setSettingsOpen(false)}
                     onSaved={(updated) => {
                         setSettings(updated);
-                        if (timerState === 'idle') {
+                        if (mode === 'focus' && timerState !== 'idle') {
+                            // Discard active focus session — no save, no sound, no notification
+                            if (intervalRef.current) {
+                                clearInterval(intervalRef.current);
+                                intervalRef.current = null;
+                            }
+                            autoStartNextRef.current = false;
+                            const total = updated.pomodoro_duration * 60;
+                            setRemaining(total);
+                            setPhaseTotal(total);
+                            setTimerState('idle');
+                        } else if (timerState === 'idle') {
                             const total = mode === 'focus'
                                 ? updated.pomodoro_duration * 60
                                 : updated.break_duration * 60;
                             setRemaining(total);
                             setPhaseTotal(total);
                         }
+                        // mode === 'break' && active → keep break running, new settings apply next phase
                     }}
                 />
             )}
