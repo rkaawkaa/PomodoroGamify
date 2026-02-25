@@ -1,25 +1,19 @@
+import { useTranslation } from '@/hooks/useTranslation';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { PageProps } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function Dashboard() {
-    return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Dashboard
-                </h2>
-            }
-        >
-            <Head title="Dashboard" />
+export default function Dashboard({ auth }: PageProps) {
+    const { t } = useTranslation();
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
-                            You're logged in!
-                        </div>
-                    </div>
-                </div>
+    return (
+        <AuthenticatedLayout>
+            <Head title={t('nav.dashboard')} />
+
+            <div className="flex flex-1 flex-col items-center justify-center py-24">
+                <p className="text-sm tracking-widest text-whisper uppercase">
+                    {t('app.tagline')}
+                </p>
             </div>
         </AuthenticatedLayout>
     );
