@@ -1,18 +1,54 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
+import AppLogo from '@/Components/AppLogo';
 import { Link } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import { PropsWithChildren } from 'react';
 
-export default function Guest({ children }: PropsWithChildren) {
+export default function GuestLayout({ children }: PropsWithChildren) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
-            <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
-                </Link>
-            </div>
+        <div className="relative min-h-screen overflow-hidden bg-abyss flex items-center justify-center px-4 py-12">
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
-                {children}
+            {/* Ambient glow — subtil, ne distrait pas */}
+            <div
+                aria-hidden
+                className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-ember opacity-[0.035] blur-[110px]"
+            />
+
+            <div className="relative z-10 w-full max-w-sm">
+
+                {/* Brand */}
+                <motion.div
+                    className="mb-8 text-center"
+                    initial={{ opacity: 0, y: -12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                >
+                    <Link
+                        href="/"
+                        className="inline-flex flex-col items-center gap-3 outline-none"
+                    >
+                        <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-ember/25 bg-ember/10 text-ember shadow-lg shadow-ember/10">
+                            <AppLogo size={32} />
+                        </span>
+                        <span className="text-lg font-semibold tracking-wide text-moonbeam">
+                            PomoBloom
+                        </span>
+                    </Link>
+                </motion.div>
+
+                {/* Carte */}
+                <motion.div
+                    className="overflow-hidden rounded-2xl border border-boundary bg-depth shadow-2xl shadow-black/50"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                        duration: 0.45,
+                        ease: [0.16, 1, 0.3, 1],
+                        delay: 0.07,
+                    }}
+                >
+                    <div className="p-8">{children}</div>
+                </motion.div>
+
             </div>
         </div>
     );

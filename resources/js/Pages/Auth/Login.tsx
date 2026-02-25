@@ -1,8 +1,8 @@
+import Field from '@/Components/Auth/Field';
 import Checkbox from '@/Components/Checkbox';
-import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { useTranslation } from '@/hooks/useTranslation';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -14,6 +14,8 @@ export default function Login({
     status?: string;
     canResetPassword: boolean;
 }) {
+    const { t } = useTranslation();
+
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -22,7 +24,6 @@ export default function Login({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         post(route('login'), {
             onFinish: () => reset('password'),
         });
@@ -30,81 +31,95 @@ export default function Login({
 
     return (
         <GuestLayout>
-            <Head title="Log in" />
+            <Head title={t('auth.login')} />
+
+            <div className="mb-6">
+                <h2 className="text-xl font-semibold text-moonbeam">
+                    {t('auth.login.title')}
+                </h2>
+                <p className="mt-1 text-sm text-whisper">
+                    {t('auth.login.subtitle')}
+                </p>
+            </div>
 
             {status && (
-                <div className="mb-4 text-sm font-medium text-green-600">
+                <div className="mb-4 rounded-lg border border-bloom/20 bg-bloom/10 px-4 py-3 text-sm text-bloom">
                     {status}
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
+            <form onSubmit={submit} className="space-y-4">
+                <Field
+                    label={t('auth.login.email')}
+                    htmlFor="email"
+                    error={errors.email}
+                >
                     <TextInput
                         id="email"
                         type="email"
                         name="email"
                         value={data.email}
-                        className="mt-1 block w-full"
                         autoComplete="username"
                         isFocused={true}
+                        hasError={!!errors.email}
                         onChange={(e) => setData('email', e.target.value)}
                     />
+                </Field>
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
+                <Field
+                    label={t('auth.login.password')}
+                    htmlFor="password"
+                    error={errors.password}
+                >
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
-                        className="mt-1 block w-full"
                         autoComplete="current-password"
+                        hasError={!!errors.password}
                         onChange={(e) => setData('password', e.target.value)}
                     />
+                </Field>
 
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4 block">
-                    <label className="flex items-center">
+                <div className="flex items-center justify-between pt-1">
+                    <label className="flex cursor-pointer items-center gap-2">
                         <Checkbox
                             name="remember"
                             checked={data.remember}
                             onChange={(e) =>
-                                setData(
-                                    'remember',
-                                    (e.target.checked || false) as false,
-                                )
+                                setData('remember', (e.target.checked || false) as false)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
-                            Remember me
+                        <span className="text-sm text-whisper">
+                            {t('auth.login.remember')}
                         </span>
                     </label>
-                </div>
 
-                <div className="mt-4 flex items-center justify-end">
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="text-sm text-whisper transition-colors hover:text-moonbeam"
                         >
-                            Forgot your password?
+                            {t('auth.login.forgot')}
                         </Link>
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
-                    </PrimaryButton>
                 </div>
+
+                <PrimaryButton className="mt-2 w-full" disabled={processing}>
+                    {t('auth.login.submit')}
+                </PrimaryButton>
             </form>
+
+            <p className="mt-6 text-center text-sm text-whisper">
+                {t('auth.login.no_account')}{' '}
+                <Link
+                    href={route('register')}
+                    className="text-ember transition-all hover:brightness-125"
+                >
+                    {t('auth.register')}
+                </Link>
+            </p>
         </GuestLayout>
     );
 }
