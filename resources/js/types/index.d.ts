@@ -19,6 +19,14 @@ export interface Category {
     is_active: boolean;
 }
 
+export interface Task {
+    id: number;
+    title: string;
+    status: 'pending' | 'done';
+    completed_at: string | null;
+    session_id: number | null;
+}
+
 export interface User {
     id: number;
     name: string;

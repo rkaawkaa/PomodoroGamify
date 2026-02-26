@@ -2,9 +2,10 @@ import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
 import ItemSelect from '@/Components/ItemSelect';
 import ManageItemsModal from '@/Components/ManageItemsModal';
 import PomodoroSettingsModal from '@/Components/PomodoroSettingsModal';
+import TaskList from '@/Components/TaskList';
 import { useTranslation } from '@/hooks/useTranslation';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Category, PageProps, PomodoroSettings, Project } from '@/types';
+import { Category, PageProps, PomodoroSettings, Project, Task } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -12,6 +13,7 @@ type Props = PageProps<{
     pomodoroSettings: PomodoroSettings;
     projects: Project[];
     categories: Category[];
+    tasks: Task[];
 }>;
 
 type TimerMode = 'focus' | 'break';
@@ -87,7 +89,7 @@ function getCsrf(): string {
     return decodeURIComponent(raw);
 }
 
-export default function Dashboard({ pomodoroSettings, projects, categories }: Props) {
+export default function Dashboard({ pomodoroSettings, projects, categories, tasks: initialTasks }: Props) {
     const { t } = useTranslation();
 
     // Modals
@@ -165,6 +167,12 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
     const notifyRef = useRef(notify);
     useEffect(() => { notifyRef.current = notify; }, [notify]);
 
+    // --- Task completion tracking (links tasks to the current focus session) ---
+    const completedDuringSessionRef = useRef<number[]>([]);
+    const handleTaskCompleted = useCallback((id: number) => {
+        completedDuringSessionRef.current = [...completedDuringSessionRef.current, id];
+    }, []);
+
     // --- Project / category selection ---
     const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
     const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
@@ -188,6 +196,9 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
 
     // --- Save pomodoro session to DB ---
     const saveSession = useCallback(async (durationSeconds: number) => {
+        // Grab and clear completed task IDs before the async call
+        const completedTaskIds = completedDuringSessionRef.current;
+        completedDuringSessionRef.current = [];
         try {
             await fetch(route('pomodoro-sessions.store'), {
                 method: 'POST',
@@ -199,6 +210,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                 body: JSON.stringify({
                     project_id: selectedProjectIdRef.current,
                     category_ids: selectedCategoryIdsRef.current,
+                    completed_task_ids: completedTaskIds,
                     duration_seconds: durationSeconds,
                 }),
             });
@@ -236,7 +248,11 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
     // --- End focus phase ---
     const endFocus = useCallback((natural: boolean) => {
         const elapsed = phaseTotalRef.current - remainingRef.current;
-        if (natural || elapsed > 300) saveSession(elapsed);
+        if (natural || elapsed > 300) {
+            saveSession(elapsed); // saveSession clears completedDuringSessionRef
+        } else {
+            completedDuringSessionRef.current = []; // discard without saving
+        }
         playSound('focus');
         notifyRef.current(
             tRef.current('notification.focus_title'),
@@ -414,7 +430,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                         </div>
 
                         {/* Ring + time */}
-                        <div className="relative mx-auto mb-2 flex h-48 w-48 items-center justify-center">
+                        <div className="relative mx-auto mb-3 flex h-48 w-48 items-center justify-center">
                             <svg
                                 className="pointer-events-none absolute inset-0 h-full w-full -rotate-90"
                                 viewBox="0 0 120 120"
@@ -435,6 +451,46 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                             </div>
                         </div>
 
+                        {/* Notification strip — compact, right below the ring */}
+                        {notifPermission !== 'granted' && (
+                            <div className={`mb-3 rounded-xl border px-3 py-2 ${
+                                notifPermission === 'denied'
+                                    ? 'border-boundary/60 bg-surface/40'
+                                    : 'border-ember/40 bg-ember/10'
+                            }`}>
+                                {notifPermission === 'denied' ? (
+                                    /* Denied: text only, multi-line */
+                                    <p className="text-[10px] leading-relaxed text-whisper/60">
+                                        {t('notification.denied_hint')}
+                                    </p>
+                                ) : (
+                                    /* Default: icon + hint + action button */
+                                    <div className="flex items-start gap-2">
+                                        <svg className="mt-0.5 shrink-0 text-ember/70" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                                        </svg>
+                                        <div className="flex flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+                                            <span className="text-[10px] leading-snug text-whisper/70">
+                                                {t('notification.enable_hint')}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={requestNotifPermission}
+                                                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold transition-colors ${
+                                                    isFocus
+                                                        ? 'bg-ember/20 text-ember hover:bg-ember/35'
+                                                        : 'bg-bloom/20 text-bloom hover:bg-bloom/35'
+                                                }`}
+                                            >
+                                                {t('notification.enable')} →
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Finish/skip button — visible only when active */}
                         <div className="mb-5 flex h-7 items-center justify-center">
                             {isActive && (
@@ -453,43 +509,13 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                             )}
                         </div>
 
-                        {/* Notification banner — shown until permission is granted */}
-                        {notifPermission !== 'granted' && (
-                            <div className={`mb-4 flex items-start gap-3 rounded-xl border px-3 py-2.5 ${
-                                notifPermission === 'denied'
-                                    ? 'border-boundary/40 bg-surface/20'
-                                    : 'border-ember/30 bg-ember/5'
-                            }`}>
-                                <svg className={`mt-0.5 shrink-0 ${notifPermission === 'denied' ? 'text-whisper/30' : 'text-ember/70'}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    {notifPermission === 'denied' ? (
-                                        <>
-                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/><path d="M18.63 13A17.89 17.89 0 0 1 18 8"/><path d="M6.26 6.26A5.86 5.86 0 0 0 6 8c0 7-3 9-3 9h14"/><path d="M18 8a6 6 0 0 0-9.33-5"/><line x1="1" y1="1" x2="23" y2="23"/>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                                        </>
-                                    )}
-                                </svg>
-                                <div className="min-w-0 flex-1">
-                                    <p className={`text-[11px] leading-snug ${notifPermission === 'denied' ? 'text-whisper/40' : 'text-whisper/70'}`}>
-                                        {notifPermission === 'denied'
-                                            ? t('notification.denied_hint')
-                                            : t('notification.enable_hint')}
-                                    </p>
-                                    {notifPermission !== 'denied' && (
-                                        <button
-                                            type="button"
-                                            onClick={requestNotifPermission}
-                                            className="mt-1.5 text-[11px] font-semibold text-ember transition-colors hover:text-ember/80"
-                                        >
-                                            {t('notification.enable')} →
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        {/* Task list */}
+                        <TaskList
+                            initialTasks={initialTasks}
+                            isFocus={isFocus}
+                            isSessionActive={isFocus && isActive}
+                            onTaskCompleted={handleTaskCompleted}
+                        />
 
                         {/* Project & category selectors */}
                         <div className="mb-6 space-y-3 rounded-2xl border border-boundary/40 bg-abyss/40 px-4 py-4">
@@ -587,6 +613,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories }: Pr
                                 intervalRef.current = null;
                             }
                             autoStartNextRef.current = false;
+                            completedDuringSessionRef.current = [];
                             const total = updated.pomodoro_duration * 60;
                             setRemaining(total);
                             setPhaseTotal(total);

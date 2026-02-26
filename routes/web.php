@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PomodoroSessionController;
 use App\Http\Controllers\PomodoroSettingsController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,6 +26,15 @@ Route::get('/dashboard', function (Request $request) {
         ],
         'projects'   => $user->projects()->orderBy('name')->get(['id', 'name', 'is_active'])->values(),
         'categories' => $user->categories()->orderBy('name')->get(['id', 'name', 'is_active'])->values(),
+        'tasks'      => $user->tasks()
+            ->where(function ($q) {
+                $q->where('status', 'pending')
+                  ->orWhere('completed_at', '>=', now()->startOfDay());
+            })
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'title', 'status', 'completed_at', 'session_id'])
+            ->values(),
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -44,6 +54,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
     Route::post('/pomodoro-sessions', [PomodoroSessionController::class, 'store'])->name('pomodoro-sessions.store');
+
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 });
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
