@@ -1,16 +1,8 @@
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps, Task } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
-// ─── CSRF ──────────────────────────────────────────────────────────────────
-function getCsrf(): string {
-    const raw = document.cookie
-        .split('; ')
-        .find((r) => r.startsWith('XSRF-TOKEN='))
-        ?.split('=').slice(1).join('=') ?? '';
-    return decodeURIComponent(raw);
-}
+import { useCallback, useRef, useState } from 'react';
 
 // ─── Toast variants ────────────────────────────────────────────────────────
 const TOAST_VARIANTS = [
@@ -23,57 +15,48 @@ type ToastVariant = 0 | 1 | 2;
 interface ToastState { msg: string; variant: ToastVariant; key: number; }
 
 // ─── Celebration messages ──────────────────────────────────────────────────
-const TOASTS: Record<string, Array<(n: string) => string>> = {
+const TOASTS: Record<string, Array<() => string>> = {
     fr: [
-        (n) => `Bravo ${n} !`,
-        (n) => `Bien joué ${n} !`,
-        (n) => `Excellent ${n} !`,
-        (n) => `${n}, tu assures !`,
-        ()  => `Une de moins !`,
-        ()  => `Tâche accomplie !`,
-        ()  => `C'est dans la boîte !`,
-        (n) => `Continue comme ça ${n} !`,
-        ()  => `En avant !`,
-        ()  => `Superbe !`,
+        () => `Bravo !`,
+        () => `Bien joué !`,
+        () => `Excellent !`,
+        () => `Une de moins !`,
+        () => `Tâche accomplie !`,
+        () => `C'est dans la boîte !`,
+        () => `En avant !`,
+        () => `Superbe !`,
     ],
     en: [
-        (n) => `Well done, ${n}!`,
-        (n) => `Nice work, ${n}!`,
-        (n) => `Great job, ${n}!`,
-        (n) => `You nailed it, ${n}!`,
-        ()  => `One down!`,
-        ()  => `Task complete!`,
-        ()  => `On a roll!`,
-        (n) => `Keep it up, ${n}!`,
-        ()  => `Nailed it!`,
-        ()  => `Awesome!`,
+        () => `Well done!`,
+        () => `Nice work!`,
+        () => `Great job!`,
+        () => `One down!`,
+        () => `Task complete!`,
+        () => `On a roll!`,
+        () => `Nailed it!`,
+        () => `Awesome!`,
     ],
 };
 
-function pickToast(locale: string, name: string): { msg: string; variant: ToastVariant } {
+function pickToast(locale: string): { msg: string; variant: ToastVariant } {
     const list = TOASTS[locale] ?? TOASTS['en'];
     const fn = list[Math.floor(Math.random() * list.length)];
     const variant = (Math.floor(Math.random() * 3)) as ToastVariant;
-    return { msg: fn(name), variant };
+    return { msg: fn(), variant };
 }
 
 // ─── Props ─────────────────────────────────────────────────────────────────
 interface Props {
-    initialTasks: Task[];
     isFocus: boolean;
-    isSessionActive: boolean;
-    onTaskCompleted: (id: number) => void;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
-export default function TaskList({ initialTasks, isFocus, isSessionActive, onTaskCompleted }: Props) {
+export default function GuestTaskList({ isFocus }: Props) {
     const { t } = useTranslation();
-    const { auth, locale } = usePage<PageProps>().props;
-    const username = auth.user.name;
+    const { locale } = usePage<PageProps>().props;
 
-    // ── Task state ───────────────────────────────────────────────────────
-    const [tasks, setTasks] = useState<Task[]>(initialTasks);
-    useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
+    // ── Tasks persisted in localStorage ──────────────────────────────────
+    const [tasks, setTasks] = useLocalStorage<Task[]>('pomobloom_guest_tasks', []);
 
     // ── Hidden ids (clear / individual hide — frontend-only) ─────────────
     const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
@@ -118,36 +101,17 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         toastTimer.current = setTimeout(() => setToast(null), 2800);
     }, []);
 
-    useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
-
-    // ── API helpers ──────────────────────────────────────────────────────
-    const headers = {
-        'Content-Type': 'application/json',
-        'X-XSRF-TOKEN': getCsrf(),
-        'Accept': 'application/json',
-    };
-
     // ── Add ───────────────────────────────────────────────────────────────
-    const handleAddSubmit = useCallback(async (e?: React.FormEvent) => {
+    const handleAddSubmit = useCallback((e?: React.FormEvent) => {
         e?.preventDefault();
         const title = addValue.trim();
         if (!title) { setIsAdding(false); setAddValue(''); return; }
         setIsAdding(false);
         setAddValue('');
-
-        const tmpId = -(Date.now());
-        setTasks((prev) => [{ id: tmpId, title, status: 'pending', completed_at: null, session_id: null }, ...prev]);
-
-        try {
-            const res = await fetch(route('tasks.store'), { method: 'POST', headers, body: JSON.stringify({ title }) });
-            if (!res.ok) throw new Error();
-            const created: Task = await res.json();
-            setTasks((prev) => prev.map((t) => (t.id === tmpId ? created : t)));
-            setActiveId(created.id);
-        } catch {
-            setTasks((prev) => prev.filter((t) => t.id !== tmpId));
-        }
-    }, [addValue]);
+        const newTask: Task = { id: Date.now(), title, status: 'pending', completed_at: null, session_id: null };
+        setTasks((prev) => [newTask, ...prev]);
+        setActiveId(newTask.id);
+    }, [addValue, setTasks]);
 
     const handleAddBlur = useCallback(() => {
         if (addValue.trim()) handleAddSubmit();
@@ -155,39 +119,24 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
     }, [addValue, handleAddSubmit]);
 
     // ── Complete ──────────────────────────────────────────────────────────
-    const handleComplete = useCallback(async (id: number) => {
+    const handleComplete = useCallback((id: number) => {
         setTasks((prev) =>
             prev.map((t) => t.id === id ? { ...t, status: 'done', completed_at: new Date().toISOString() } : t)
         );
         setFlashId(id);
         setTimeout(() => setFlashId(null), 500);
-        const { msg, variant } = pickToast(locale, username);
+        const { msg, variant } = pickToast(locale);
         showToast(msg, variant);
-
-        if (isSessionActive) onTaskCompleted(id);
         if (activeId === id) setActiveId(null);
-
-        try {
-            await fetch(route('tasks.update', id), { method: 'PATCH', headers, body: JSON.stringify({ status: 'done' }) });
-        } catch {
-            setTasks((prev) => prev.map((t) => t.id === id ? { ...t, status: 'pending', completed_at: null } : t));
-        }
-    }, [isSessionActive, activeId, locale, username, onTaskCompleted, showToast]);
+    }, [activeId, locale, setTasks, showToast]);
 
     // ── Delete ────────────────────────────────────────────────────────────
-    const handleDelete = useCallback(async (id: number) => {
-        const removed = tasks.find((t) => t.id === id);
+    const handleDelete = useCallback((id: number) => {
         setTasks((prev) => prev.filter((t) => t.id !== id));
         if (activeId === id) setActiveId(null);
+    }, [activeId, setTasks]);
 
-        try {
-            await fetch(route('tasks.destroy', id), { method: 'DELETE', headers });
-        } catch {
-            if (removed) setTasks((prev) => [...prev, removed]);
-        }
-    }, [tasks, activeId]);
-
-    // ── Hide (frontend-only) ──────────────────────────────────────────────
+    // ── Hide ──────────────────────────────────────────────────────────────
     const handleHide = useCallback((id: number) => {
         setHiddenIds((prev) => new Set([...prev, id]));
     }, []);
@@ -198,20 +147,12 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         setEditValue(task.title);
     }, []);
 
-    const commitRename = useCallback(async (id: number) => {
+    const commitRename = useCallback((id: number) => {
         const title = editValue.trim();
         setEditingId(null);
         if (!title) return;
-        const prev = tasks.find((t) => t.id === id)?.title ?? '';
-        if (title === prev) return;
-
         setTasks((list) => list.map((t) => t.id === id ? { ...t, title } : t));
-        try {
-            await fetch(route('tasks.update', id), { method: 'PATCH', headers, body: JSON.stringify({ title }) });
-        } catch {
-            setTasks((list) => list.map((t) => t.id === id ? { ...t, title: prev } : t));
-        }
-    }, [editValue, tasks]);
+    }, [editValue, setTasks]);
 
     // ── Derived ───────────────────────────────────────────────────────────
     const visibleTasks = tasks.filter((t) => !hiddenIds.has(t.id));
@@ -277,10 +218,8 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
 
             {/* ── Task list ──────────────────────────────────────────────── */}
             <div className="max-h-36 space-y-0.5 overflow-y-auto">
-
-                {/* Pending tasks (draggable) */}
                 {pending.map((task) => (
-                    <TaskRow
+                    <GuestTaskRow
                         key={task.id}
                         task={task}
                         isActive={activeId === task.id}
@@ -305,9 +244,8 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                     />
                 ))}
 
-                {/* Done tasks (shown only when toggled) */}
                 {visibleDone.map((task) => (
-                    <TaskRow
+                    <GuestTaskRow
                         key={task.id}
                         task={task}
                         isActive={false}
@@ -332,7 +270,6 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                     />
                 ))}
 
-                {/* Empty state — no pending tasks */}
                 {pending.length === 0 && !isAdding && allDone.length === 0 && (
                     <p className="py-1 text-center text-[11px] text-whisper/50">{t('tasks.empty')}</p>
                 )}
@@ -341,7 +278,6 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
             {/* ── Footer ─────────────────────────────────────────────────── */}
             {(allDone.length > 0 || pending.length > 0) && (
                 <div className="mt-2 flex items-center justify-between gap-2">
-                    {/* Done tasks toggle */}
                     {allDone.length > 0 ? (
                         <button
                             type="button"
@@ -357,11 +293,8 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                             </svg>
                             <span>{doneLabel}</span>
                         </button>
-                    ) : (
-                        <span />
-                    )}
+                    ) : <span />}
 
-                    {/* Clear button — hides done tasks only */}
                     {allDone.length > 0 && (
                         <button
                             type="button"
@@ -377,7 +310,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
     );
 }
 
-// ─── Task row ──────────────────────────────────────────────────────────────
+// ─── Task row (identical UI to TaskList's TaskRow) ─────────────────────────
 interface RowProps {
     task: Task;
     isActive: boolean;
@@ -401,7 +334,7 @@ interface RowProps {
     onDragEnd: () => void;
 }
 
-function TaskRow({
+function GuestTaskRow({
     task, isActive, isFlashing, isEditing, editValue, isFocus,
     isDragging, isDraggedOver,
     onToggleActive, onComplete, onDelete, onHide, onStartEdit, onEditChange, onCommitRename, onCancelRename,
@@ -426,7 +359,6 @@ function TaskRow({
                 ${!isDone ? 'cursor-grab active:cursor-grabbing' : ''}
             `}
         >
-            {/* Active dot */}
             <button
                 type="button"
                 onClick={onToggleActive}
@@ -440,7 +372,6 @@ function TaskRow({
                 }`}
             />
 
-            {/* Title / rename input */}
             {isEditing ? (
                 <input
                     autoFocus
@@ -469,7 +400,6 @@ function TaskRow({
                 </span>
             )}
 
-            {/* Actions */}
             <div className={`flex shrink-0 items-center gap-1 transition-opacity duration-150 ${
                 isDone ? 'opacity-0 group-hover:opacity-80' : 'opacity-0 group-hover:opacity-100'
             }`}>
@@ -485,7 +415,6 @@ function TaskRow({
                         </svg>
                     </button>
                 )}
-                {/* Hide button — done tasks only */}
                 {isDone && (
                     <button
                         type="button"
@@ -493,7 +422,6 @@ function TaskRow({
                         title="Masquer"
                         className="flex h-5 w-5 items-center justify-center rounded text-whisper/50 hover:bg-surface/80 hover:text-whisper/80"
                     >
-                        {/* Eye-off icon */}
                         <svg width="10" height="10" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M1 1l12 12" />
                             <path d="M6.3 3.1A5.4 5.4 0 0 1 7 3c3 0 5.4 2.7 6 4-.3.8-1 1.9-2 2.8" />
