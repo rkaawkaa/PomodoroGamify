@@ -27,6 +27,7 @@ class User extends Authenticatable
         'break_duration',
         'auto_start_breaks',
         'auto_start_pomodoros',
+        'points',
     ];
 
     /**
@@ -64,6 +65,11 @@ class User extends Authenticatable
         return $this->hasMany(Task::class);
     }
 
+    public function goals(): HasMany
+    {
+        return $this->hasMany(UserGoal::class);
+    }
+
     protected function casts(): array
     {
         return [
@@ -73,6 +79,7 @@ class User extends Authenticatable
             'auto_start_pomodoros' => 'boolean',
             'pomodoro_duration'    => 'integer',
             'break_duration'       => 'integer',
+            'points'               => 'integer',
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Services\PointService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,7 +29,7 @@ class TaskController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, Task $task): JsonResponse
+    public function update(Request $request, Task $task, PointService $points): JsonResponse
     {
         abort_if($task->user_id !== $request->user()->id, 403);
 
@@ -37,8 +38,10 @@ class TaskController extends Controller
             'status' => 'sometimes|in:pending,done',
         ]);
 
+        $wasNotDone = $task->status !== 'done';
+
         if (isset($data['status'])) {
-            if ($data['status'] === 'done' && $task->status !== 'done') {
+            if ($data['status'] === 'done' && $wasNotDone) {
                 $task->completed_at = now();
             } elseif ($data['status'] === 'pending') {
                 $task->completed_at = null;
@@ -47,7 +50,16 @@ class TaskController extends Controller
 
         $task->fill($data)->save();
 
-        return response()->json(['ok' => true]);
+        $awards = [];
+        if (isset($data['status']) && $data['status'] === 'done' && $wasNotDone) {
+            $awards = $points->awardTask($request->user());
+        }
+
+        return response()->json([
+            'ok'          => true,
+            'awards'      => $awards,
+            'user_points' => empty($awards) ? null : $request->user()->fresh()->points,
+        ]);
     }
 
     public function destroy(Request $request, Task $task): JsonResponse

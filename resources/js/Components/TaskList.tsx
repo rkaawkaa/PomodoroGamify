@@ -1,5 +1,5 @@
 import { useTranslation } from '@/hooks/useTranslation';
-import { PageProps, Task } from '@/types';
+import { PageProps, PointAward, Task } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -63,10 +63,11 @@ interface Props {
     isFocus: boolean;
     isSessionActive: boolean;
     onTaskCompleted: (id: number) => void;
+    onTaskAward?: (awards: PointAward[], userPoints: number) => void;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
-export default function TaskList({ initialTasks, isFocus, isSessionActive, onTaskCompleted }: Props) {
+export default function TaskList({ initialTasks, isFocus, isSessionActive, onTaskCompleted, onTaskAward }: Props) {
     const { t } = useTranslation();
     const { auth, locale } = usePage<PageProps>().props;
     const username = auth.user.name;
@@ -168,11 +169,17 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         if (activeId === id) setActiveId(null);
 
         try {
-            await fetch(route('tasks.update', id), { method: 'PATCH', headers, body: JSON.stringify({ status: 'done' }) });
+            const res = await fetch(route('tasks.update', id), { method: 'PATCH', headers, body: JSON.stringify({ status: 'done' }) });
+            if (res.ok && onTaskAward) {
+                const json = await res.json() as { ok: boolean; awards: PointAward[]; user_points: number | null };
+                if (json.awards?.length && json.user_points !== null) {
+                    onTaskAward(json.awards, json.user_points);
+                }
+            }
         } catch {
             setTasks((prev) => prev.map((t) => t.id === id ? { ...t, status: 'pending', completed_at: null } : t));
         }
-    }, [isSessionActive, activeId, locale, username, onTaskCompleted, showToast]);
+    }, [isSessionActive, activeId, locale, username, onTaskCompleted, onTaskAward, showToast]);
 
     // ── Delete ────────────────────────────────────────────────────────────
     const handleDelete = useCallback(async (id: number) => {

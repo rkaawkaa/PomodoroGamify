@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('point_events', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('event_key');          // e.g. 'pomodoro_base', 'daily_first', 'milestone_total_100'
+            $table->unsignedInteger('points');
+            $table->json('meta')->nullable();     // e.g. {"days": 5} or {"n": 7}
+            $table->foreignId('session_id')->nullable()->constrained('pomodoro_sessions')->nullOnDelete();
+            $table->timestamps();
+
+            $table->index(['user_id', 'created_at']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('point_events');
+    }
+};

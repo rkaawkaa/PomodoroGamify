@@ -27,12 +27,27 @@ export interface Task {
     session_id: number | null;
 }
 
+export interface UserGoal {
+    id: number;
+    period_type: 'daily' | 'monthly';
+    target: number;
+    project_id: number | null;
+    project?: { id: number; name: string };
+}
+
+export interface PointAward {
+    event_key: string;
+    points: number;
+    meta?: Record<string, number | string> | null;
+}
+
 export interface User {
     id: number;
     name: string;
     email: string;
     locale: Locale;
     email_verified_at?: string;
+    points: number;
 }
 
 export type PageProps<

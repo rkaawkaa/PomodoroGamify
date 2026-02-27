@@ -1,11 +1,15 @@
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
+import GoalsModal from '@/Components/GoalsModal';
 import ItemSelect from '@/Components/ItemSelect';
+import LevelUpModal from '@/Components/LevelUpModal';
 import ManageItemsModal from '@/Components/ManageItemsModal';
+import PointsReward from '@/Components/PointsReward';
 import PomodoroSettingsModal from '@/Components/PomodoroSettingsModal';
 import TaskList from '@/Components/TaskList';
+import { getLevelForPoints, Level } from '@/data/levels';
 import { useTranslation } from '@/hooks/useTranslation';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Category, PageProps, PomodoroSettings, Project, Task } from '@/types';
+import { Category, PageProps, PointAward, PomodoroSettings, Project, Task, UserGoal } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -14,7 +18,18 @@ type Props = PageProps<{
     projects: Project[];
     categories: Category[];
     tasks: Task[];
+    goals: UserGoal[];
+    todayCount: number;
+    monthTotal: number;
+    monthCounts: Record<string, number>;
+    userPoints: number;
 }>;
+
+interface PendingReward {
+    awards: PointAward[];
+    totalEarned: number;
+    userPoints: number;
+}
 
 type TimerMode = 'focus' | 'break';
 type TimerState = 'idle' | 'running' | 'paused';
@@ -89,12 +104,107 @@ function getCsrf(): string {
     return decodeURIComponent(raw);
 }
 
-export default function Dashboard({ pomodoroSettings, projects, categories, tasks: initialTasks }: Props) {
+// ─── Growing plant companion ────────────────────────────────────────────────
+// Small animated plant that breathes during focus and sways during break.
+
+const PLANT_KEYFRAMES = `
+@keyframes plantBreathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50%       { transform: scale(1.07) translateY(-3px); }
+}
+@keyframes plantSway {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    30%      { transform: rotate(-4deg) translateY(-2px); }
+    70%      { transform: rotate(4deg) translateY(-2px); }
+}
+@keyframes plantIdle {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-1px); }
+}`;
+
+function GrowingPlant({ timerState, isFocus }: { timerState: TimerState; isFocus: boolean }) {
+    const isRunning = timerState === 'running';
+    const animation = isRunning && isFocus
+        ? 'plantBreathe 4s ease-in-out infinite'
+        : isRunning
+        ? 'plantSway 7s ease-in-out infinite'
+        : 'plantIdle 6s ease-in-out infinite';
+
+    // Focus colours → ember-adjacent greens; break → bloom-adjacent purples
+    const stem   = isFocus ? '#22c55e' : '#a78bfa';
+    const leaf   = isFocus ? '#4ade80' : '#c4b5fd';
+    const leafDk = isFocus ? '#16a34a' : '#8b5cf6';
+    const head   = isFocus ? '#86efac' : '#ddd6fe';
+    const face   = isFocus ? '#15803d' : '#5b21b6';
+    const pot    = isFocus ? '#c2410c' : '#7c3aed';
+    const potRim = isFocus ? '#ea580c' : '#9333ea';
+    const soil   = isFocus ? '#78350f' : '#4c1d95';
+
+    return (
+        <div
+            style={{
+                width: 52,
+                height: 52,
+                animation,
+                transformOrigin: 'center bottom',
+                opacity: timerState === 'idle' ? 0.35 : 0.9,
+                transition: 'opacity 1.2s ease',
+                willChange: 'transform',
+            }}
+        >
+            <svg viewBox="0 0 52 52" width={52} height={52} fill="none" aria-hidden="true">
+                {/* pot */}
+                <path d={`M16 42 L17.5 51 L34.5 51 L36 42 Z`} fill={pot}/>
+                <rect x="14" y="39" width="24" height="5" rx="2" fill={potRim}/>
+                <ellipse cx="26" cy="42" rx="10" ry="2.5" fill={soil}/>
+                {/* stem */}
+                <line x1="26" y1="42" x2="26" y2="26" stroke={stem} strokeWidth="2.5" strokeLinecap="round"/>
+                {/* left leaf */}
+                <ellipse cx="16.5" cy="34" rx="7" ry="3.5" fill={leafDk} transform="rotate(-30 16.5 34)"/>
+                <ellipse cx="15.5" cy="33.5" rx="5" ry="2.5" fill={leaf} transform="rotate(-30 15.5 33.5)"/>
+                {/* right leaf */}
+                <ellipse cx="35.5" cy="34" rx="7" ry="3.5" fill={leafDk} transform="rotate(30 35.5 34)"/>
+                <ellipse cx="36.5" cy="33.5" rx="5" ry="2.5" fill={leaf} transform="rotate(30 36.5 33.5)"/>
+                {/* head */}
+                <circle cx="26" cy="20" r="10" fill={head}/>
+                {/* eyes */}
+                <circle cx="22.5" cy="19" r="1.5" fill={face}/>
+                <circle cx="29.5" cy="19" r="1.5" fill={face}/>
+                {/* smile */}
+                <path d="M22 23 Q26 27 30 23" stroke={face} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+            </svg>
+        </div>
+    );
+}
+
+export default function Dashboard({ pomodoroSettings, projects, categories, tasks: initialTasks, goals: initialGoals, todayCount: initialTodayCount, monthTotal: initialMonthTotal, monthCounts: initialMonthCounts, userPoints: initialUserPoints }: Props) {
     const { t } = useTranslation();
 
     // Modals
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [manageOpen, setManageOpen] = useState(false);
+    const [goalsOpen, setGoalsOpen] = useState(false);
+
+    // Goals + points state (updated optimistically)
+    const [goals, setGoals] = useState<UserGoal[]>(initialGoals);
+    const [todayCount, setTodayCount] = useState(initialTodayCount);
+    const [monthTotal, setMonthTotal] = useState(initialMonthTotal);
+    const [monthCounts, setMonthCounts] = useState<Record<string, number>>(initialMonthCounts);
+    const [userPoints, setUserPoints] = useState(initialUserPoints);
+    const [pendingReward, setPendingReward] = useState<PendingReward | null>(null);
+    const [pendingLevelUp, setPendingLevelUp] = useState<Level | null>(null);
+
+    // Track previous points to detect level-up crossings
+    const prevUserPointsRef = useRef(initialUserPoints);
+    const updateUserPoints = useCallback((newPoints: number) => {
+        const prevLevel = getLevelForPoints(prevUserPointsRef.current);
+        const newLevel = getLevelForPoints(newPoints);
+        prevUserPointsRef.current = newPoints;
+        setUserPoints(newPoints);
+        if (newLevel.level > prevLevel.level) {
+            setPendingLevelUp(newLevel);
+        }
+    }, []);
 
     // Settings
     const [settings, setSettings] = useState<PomodoroSettings>(pomodoroSettings);
@@ -167,6 +277,9 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
     const notifyRef = useRef(notify);
     useEffect(() => { notifyRef.current = notify; }, [notify]);
 
+    // --- Session start timestamp (set on first start/resume of a focus phase) ---
+    const sessionStartAtRef = useRef<string | null>(null);
+
     // --- Task completion tracking (links tasks to the current focus session) ---
     const completedDuringSessionRef = useRef<number[]>([]);
     const handleTaskCompleted = useCallback((id: number) => {
@@ -199,8 +312,10 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
         // Grab and clear completed task IDs before the async call
         const completedTaskIds = completedDuringSessionRef.current;
         completedDuringSessionRef.current = [];
+        const startedAt = sessionStartAtRef.current;
+        sessionStartAtRef.current = null;
         try {
-            await fetch(route('pomodoro-sessions.store'), {
+            const res = await fetch(route('pomodoro-sessions.store'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -212,8 +327,26 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     category_ids: selectedCategoryIdsRef.current,
                     completed_task_ids: completedTaskIds,
                     duration_seconds: durationSeconds,
+                    started_at: startedAt,
                 }),
             });
+
+            // Increment counters optimistically (regardless of points)
+            setTodayCount((c) => c + 1);
+            setMonthTotal((c) => c + 1);
+            if (selectedProjectIdRef.current) {
+                const projKey = String(selectedProjectIdRef.current);
+                setMonthCounts((prev) => ({ ...prev, [projKey]: (prev[projKey] ?? 0) + 1 }));
+            }
+
+            // Parse points awards from response
+            if (res.ok) {
+                const json = await res.json() as { awards: PointAward[]; total_earned: number; user_points: number };
+                if (json.total_earned > 0) {
+                    updateUserPoints(json.user_points);
+                    setPendingReward({ awards: json.awards, totalEarned: json.total_earned, userPoints: json.user_points });
+                }
+            }
         } catch { /* silent — never disrupt UX for a save failure */ }
     }, []);
 
@@ -280,6 +413,9 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
     useEffect(() => {
         if (timerState === 'idle' && autoStartNextRef.current) {
             autoStartNextRef.current = false;
+            if (modeRef.current === 'focus') {
+                sessionStartAtRef.current = new Date().toISOString();
+            }
             setTimerState('running');
         }
     }, [timerState]);
@@ -364,7 +500,12 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
     }, []);
 
     // --- User actions ---
-    const handleStart = useCallback(() => setTimerState('running'), []);
+    const handleStart = useCallback(() => {
+        if (modeRef.current === 'focus') {
+            sessionStartAtRef.current = new Date().toISOString();
+        }
+        setTimerState('running');
+    }, []);
     const handlePause = useCallback(() => setTimerState('paused'), []);
     const handleResume = useCallback(() => setTimerState('running'), []);
     const handleSkipBreak = useCallback(() => {
@@ -392,6 +533,8 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
     const dashOffset = CIRCUMFERENCE * (1 - progress);
 
     return (
+        <>
+        <style>{PLANT_KEYFRAMES}</style>
         <AuthenticatedLayout onManage={() => setManageOpen(true)}>
             <Head title="Pomodoro" />
 
@@ -449,6 +592,11 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                                     {pad(minutes)}:{pad(seconds)}
                                 </span>
                             </div>
+                        </div>
+
+                        {/* Growing plant companion — breathes during focus, sways during break */}
+                        <div className="mb-1 flex justify-center">
+                            <GrowingPlant timerState={timerState} isFocus={isFocus} />
                         </div>
 
                         {/* Notification strip — compact, right below the ring */}
@@ -515,6 +663,10 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                             isFocus={isFocus}
                             isSessionActive={isFocus && isActive}
                             onTaskCompleted={handleTaskCompleted}
+                            onTaskAward={(awards, pts) => {
+                                updateUserPoints(pts);
+                                setPendingReward({ awards, totalEarned: awards.reduce((s, a) => s + a.points, 0), userPoints: pts });
+                            }}
                         />
 
                         {/* Project & category selectors */}
@@ -598,6 +750,101 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
 
                     </div>
                 </div>
+
+                {/* ── Goal progress strip ── */}
+                {(() => {
+                    const dailyGoal = goals.find((g) => g.period_type === 'daily') ?? null;
+                    const monthlyGoals = goals.filter((g) => g.period_type === 'monthly');
+                    const hasGoals = dailyGoal || monthlyGoals.length > 0;
+                    if (!hasGoals) return null;
+
+                    return (
+                        <div className="mt-3 w-full max-w-xs space-y-2">
+                            {/* Daily */}
+                            {dailyGoal && (() => {
+                                const done = todayCount;
+                                const pct = Math.min(1, done / dailyGoal.target);
+                                const reached = done >= dailyGoal.target;
+                                return (
+                                    <div className="rounded-xl border border-boundary/50 bg-depth/80 px-4 py-2.5">
+                                        <div className="mb-1.5 flex items-center justify-between">
+                                            <span className="text-[10px] font-semibold uppercase tracking-wider text-whisper/60">
+                                                {t('goals.today_progress')}
+                                            </span>
+                                            <span className={`text-[11px] font-bold tabular-nums ${reached ? 'text-bloom' : 'text-moonbeam/80'}`}>
+                                                {reached ? `✓ ${t('goals.reached')}` : `${done} / ${dailyGoal.target}`}
+                                            </span>
+                                        </div>
+                                        <div className="h-1 w-full overflow-hidden rounded-full bg-boundary/40">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-bloom' : 'bg-ember'}`}
+                                                style={{ width: `${pct * 100}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Monthly goals */}
+                            {monthlyGoals.map((g) => {
+                                const done = g.project_id === null
+                                    ? monthTotal
+                                    : (monthCounts[String(g.project_id)] ?? 0);
+                                const pct = Math.min(1, done / g.target);
+                                const reached = done >= g.target;
+                                const label = g.project_id === null
+                                    ? t('goals.global')
+                                    : (g.project?.name ?? `#${g.project_id}`);
+                                return (
+                                    <div key={g.id} className="rounded-xl border border-boundary/50 bg-depth/80 px-4 py-2.5">
+                                        <div className="mb-1.5 flex items-center justify-between">
+                                            <span className="text-[10px] font-semibold uppercase tracking-wider text-whisper/60">
+                                                {t('goals.month_progress')} · {label}
+                                            </span>
+                                            <span className={`text-[11px] font-bold tabular-nums ${reached ? 'text-bloom' : 'text-moonbeam/80'}`}>
+                                                {reached ? `✓ ${t('goals.reached')}` : `${done} / ${g.target}`}
+                                            </span>
+                                        </div>
+                                        <div className="h-1 w-full overflow-hidden rounded-full bg-boundary/40">
+                                            <div
+                                                className={`h-full rounded-full transition-all duration-700 ${reached ? 'bg-bloom' : 'bg-aurora'}`}
+                                                style={{ width: `${pct * 100}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    );
+                })()}
+
+                {/* ── Points badge + Goals button ── */}
+                <div className="mt-3 flex items-center gap-2">
+                    {/* Points counter pill */}
+                    <div className="flex items-center gap-1 rounded-full border border-ember/30 bg-ember/10 px-2.5 py-1">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-ember/80">
+                            <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                        <span className="text-[10px] font-bold tabular-nums text-ember">
+                            {userPoints.toLocaleString()}
+                        </span>
+                        <span className="text-[9px] text-ember/60">{t('points.badge_label')}</span>
+                    </div>
+
+                    {/* Goals button */}
+                    <button
+                        type="button"
+                        onClick={() => setGoalsOpen(true)}
+                        className="flex items-center gap-1.5 rounded-full border border-boundary/50 bg-depth/60 px-3 py-1 text-whisper/50 transition-colors hover:border-whisper/40 hover:bg-depth hover:text-moonbeam"
+                    >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span className="text-[10px] font-semibold uppercase tracking-wider">{t('goals.button')}</span>
+                    </button>
+                </div>
+
             </div>
 
             {settingsOpen && (
@@ -637,6 +884,32 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     onClose={() => setManageOpen(false)}
                 />
             )}
+
+            {goalsOpen && (
+                <GoalsModal
+                    goals={goals}
+                    projects={projects}
+                    onClose={() => setGoalsOpen(false)}
+                    onSaved={(updated) => setGoals(updated)}
+                />
+            )}
+
+            {pendingReward && (
+                <PointsReward
+                    awards={pendingReward.awards}
+                    totalEarned={pendingReward.totalEarned}
+                    userPoints={pendingReward.userPoints}
+                    onDismiss={() => setPendingReward(null)}
+                />
+            )}
+
+            {pendingLevelUp && (
+                <LevelUpModal
+                    level={pendingLevelUp}
+                    onDismiss={() => setPendingLevelUp(null)}
+                />
+            )}
         </AuthenticatedLayout>
+        </>
     );
 }
