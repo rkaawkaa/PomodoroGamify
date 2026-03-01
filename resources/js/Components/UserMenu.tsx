@@ -1,5 +1,7 @@
-import PlantAvatar from '@/Components/PlantAvatar';
+import Avatar from '@/Components/Avatar';
 import { getLevelForPoints } from '@/data/levels';
+import { getThemeTitle } from '@/data/themes';
+import { useTheme } from '@/hooks/useTheme';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -11,11 +13,13 @@ interface Props {
 
 export default function UserMenu({ onManage }: Props) {
     const { auth } = usePage<PageProps>().props;
-    const { t } = useTranslation();
+    const { t, locale } = useTranslation();
+    const { theme } = useTheme();
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
     const level = getLevelForPoints(auth.user.points ?? 0);
+    const title = getThemeTitle(theme, level.level, locale);
 
     useEffect(() => {
         const handler = (e: MouseEvent) => {
@@ -33,14 +37,14 @@ export default function UserMenu({ onManage }: Props) {
             >
                 {/* Avatar circle */}
                 <span className={`flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border ${level.borderColor} ${level.bgColor}`}>
-                    <PlantAvatar level={level.level} size={22} />
+                    <Avatar level={level.level} size={22} />
                 </span>
 
                 {/* Name + level */}
                 <span className="flex flex-col items-start leading-none">
                     <span>{auth.user.name}</span>
                     <span className={`text-[9px] normal-case font-normal tracking-normal ${level.color} opacity-80`}>
-                        nv.{level.level} · {t(`level.${level.level}`)}
+                        nv.{level.level} · {title}
                     </span>
                 </span>
 
@@ -67,7 +71,7 @@ export default function UserMenu({ onManage }: Props) {
                         className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-medium text-whisper transition-colors hover:bg-surface hover:text-moonbeam"
                     >
                         <span className={`flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full border ${level.borderColor} ${level.bgColor}`}>
-                            <PlantAvatar level={level.level} size={18} />
+                            <Avatar level={level.level} size={18} />
                         </span>
                         {t('nav.my_profile')}
                         <span className={`ml-auto text-[9px] font-bold ${level.color}`}>

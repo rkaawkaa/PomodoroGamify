@@ -37,6 +37,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'locale'       => app()->getLocale(),
             'translations' => $this->loadTranslations(),
+            'flash'        => fn () => ['award' => session('award')],
         ];
     }
 

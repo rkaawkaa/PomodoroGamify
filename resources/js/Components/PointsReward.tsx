@@ -24,7 +24,10 @@ function useEventDisplay(award: PointAward): EventDisplay {
     if (key === 'task_daily_1')       return { emoji: '✅', label: t('points.task_daily_1'),   accent: 'text-bloom',   isMilestone: false };
     if (key === 'task_daily_5')       return { emoji: '🎉', label: t('points.task_daily_5'),   accent: 'text-bloom',   isMilestone: false };
     if (key === 'task_daily_10')      return { emoji: '⭐', label: t('points.task_daily_10'),  accent: 'text-bloom',   isMilestone: false };
-    if (key === 'random_reward')      return { emoji: '🎲', label: t('points.random_reward'),  accent: 'text-coral',   isMilestone: false };
+    if (key === 'random_reward')          return { emoji: '🎲', label: t('points.random_reward'),          accent: 'text-coral',  isMilestone: false };
+    if (key === 'first_project')          return { emoji: '📁', label: t('points.first_project'),          accent: 'text-bloom',  isMilestone: false };
+    if (key === 'first_category')         return { emoji: '🏷️', label: t('points.first_category'),        accent: 'text-bloom',  isMilestone: false };
+    if (key === 'first_linked_pomodoro')  return { emoji: '🔗', label: t('points.first_linked_pomodoro'), accent: 'text-aurora', isMilestone: false };
 
     // Milestone events
     const label = t(`points.${key}`) ?? key;

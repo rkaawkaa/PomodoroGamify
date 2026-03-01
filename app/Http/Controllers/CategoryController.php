@@ -16,6 +16,16 @@ class CategoryController extends Controller
 
         $request->user()->categories()->create($validated);
 
+        if ($request->user()->categories()->count() === 1) {
+            $pts = 50;
+            $request->user()->increment('points', $pts);
+            session()->flash('award', [
+                'awards'       => [['event_key' => 'first_category', 'points' => $pts]],
+                'total_earned' => $pts,
+                'user_points'  => $request->user()->fresh()->points,
+            ]);
+        }
+
         return back();
     }
 

@@ -3,12 +3,15 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MessageLikeController;
+use App\Http\Controllers\SocialProofController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PomodoroSessionController;
 use App\Http\Controllers\PomodoroSettingsController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\VictoryMessageController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,7 +19,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('Welcome');
-});
+})->name('welcome');
 
 Route::get('/dashboard', function (Request $request) {
     $user = $request->user();
@@ -62,7 +65,8 @@ Route::get('/dashboard', function (Request $request) {
         'todayCount'  => $todayCount,
         'monthTotal'  => $monthTotal,
         'monthCounts' => $monthCounts,
-        'userPoints'  => $user->points,
+        'userPoints'           => $user->points,
+        'onboardingCompleted'  => $user->onboarding_completed,
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -97,7 +101,33 @@ Route::middleware('auth')->group(function () {
     })->name('player-profile');
 
     Route::get('/stats', [StatsController::class, 'index'])->name('stats');
+
+    // Onboarding
+    Route::post('/onboarding/complete', function (Request $request) {
+        $request->user()->update(['onboarding_completed' => true]);
+        return response()->noContent();
+    })->name('onboarding.complete');
+
+    // La Flamme — Victory Wall
+    Route::get('/victory-messages', [VictoryMessageController::class, 'index'])->name('victory-messages.index');
+    Route::post('/victory-messages', [VictoryMessageController::class, 'store'])->name('victory-messages.store');
+    Route::delete('/victory-messages/{victoryMessage}', [VictoryMessageController::class, 'destroy'])->name('victory-messages.destroy');
+    Route::post('/victory-messages/{victoryMessage}/like', [MessageLikeController::class, 'toggle'])->name('victory-messages.like');
 });
+
+Route::get('/social-proof', [SocialProofController::class, 'index'])->name('social-proof');
+
+Route::get('/guide', function () {
+    return Inertia::render('Help');
+})->name('help');
+
+Route::get('/legal', function () {
+    return Inertia::render('Legal');
+})->name('legal');
+
+Route::get('/privacy', function () {
+    return Inertia::render('Privacy');
+})->name('privacy');
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 

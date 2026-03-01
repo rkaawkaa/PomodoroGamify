@@ -3,14 +3,19 @@ import GoalsModal from '@/Components/GoalsModal';
 import ItemSelect from '@/Components/ItemSelect';
 import LevelUpModal from '@/Components/LevelUpModal';
 import ManageItemsModal from '@/Components/ManageItemsModal';
+import OnboardingModal from '@/Components/OnboardingModal';
 import PointsReward from '@/Components/PointsReward';
 import PomodoroSettingsModal from '@/Components/PomodoroSettingsModal';
+import SocialProof from '@/Components/SocialProof';
 import TaskList from '@/Components/TaskList';
+import TimerIllustration from '@/Components/TimerIllustration';
+import VictoryInspireModal from '@/Components/VictoryInspireModal';
+import VictoryWallModal from '@/Components/VictoryWallModal';
 import { getLevelForPoints, Level } from '@/data/levels';
 import { useTranslation } from '@/hooks/useTranslation';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Category, PageProps, PointAward, PomodoroSettings, Project, Task, UserGoal } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Category, PageProps, PointAward, PomodoroSettings, Project, Task, UserGoal, VictoryMessage } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Props = PageProps<{
@@ -23,6 +28,7 @@ type Props = PageProps<{
     monthTotal: number;
     monthCounts: Record<string, number>;
     userPoints: number;
+    onboardingCompleted: boolean;
 }>;
 
 interface PendingReward {
@@ -104,86 +110,20 @@ function getCsrf(): string {
     return decodeURIComponent(raw);
 }
 
-// ─── Growing plant companion ────────────────────────────────────────────────
-// Small animated plant that breathes during focus and sways during break.
 
-const PLANT_KEYFRAMES = `
-@keyframes plantBreathe {
-    0%, 100% { transform: scale(1) translateY(0); }
-    50%       { transform: scale(1.07) translateY(-3px); }
-}
-@keyframes plantSway {
-    0%, 100% { transform: rotate(0deg) translateY(0); }
-    30%      { transform: rotate(-4deg) translateY(-2px); }
-    70%      { transform: rotate(4deg) translateY(-2px); }
-}
-@keyframes plantIdle {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(-1px); }
-}`;
-
-function GrowingPlant({ timerState, isFocus }: { timerState: TimerState; isFocus: boolean }) {
-    const isRunning = timerState === 'running';
-    const animation = isRunning && isFocus
-        ? 'plantBreathe 4s ease-in-out infinite'
-        : isRunning
-        ? 'plantSway 7s ease-in-out infinite'
-        : 'plantIdle 6s ease-in-out infinite';
-
-    // Focus colours → ember-adjacent greens; break → bloom-adjacent purples
-    const stem   = isFocus ? '#22c55e' : '#a78bfa';
-    const leaf   = isFocus ? '#4ade80' : '#c4b5fd';
-    const leafDk = isFocus ? '#16a34a' : '#8b5cf6';
-    const head   = isFocus ? '#86efac' : '#ddd6fe';
-    const face   = isFocus ? '#15803d' : '#5b21b6';
-    const pot    = isFocus ? '#c2410c' : '#7c3aed';
-    const potRim = isFocus ? '#ea580c' : '#9333ea';
-    const soil   = isFocus ? '#78350f' : '#4c1d95';
-
-    return (
-        <div
-            style={{
-                width: 52,
-                height: 52,
-                animation,
-                transformOrigin: 'center bottom',
-                opacity: timerState === 'idle' ? 0.35 : 0.9,
-                transition: 'opacity 1.2s ease',
-                willChange: 'transform',
-            }}
-        >
-            <svg viewBox="0 0 52 52" width={52} height={52} fill="none" aria-hidden="true">
-                {/* pot */}
-                <path d={`M16 42 L17.5 51 L34.5 51 L36 42 Z`} fill={pot}/>
-                <rect x="14" y="39" width="24" height="5" rx="2" fill={potRim}/>
-                <ellipse cx="26" cy="42" rx="10" ry="2.5" fill={soil}/>
-                {/* stem */}
-                <line x1="26" y1="42" x2="26" y2="26" stroke={stem} strokeWidth="2.5" strokeLinecap="round"/>
-                {/* left leaf */}
-                <ellipse cx="16.5" cy="34" rx="7" ry="3.5" fill={leafDk} transform="rotate(-30 16.5 34)"/>
-                <ellipse cx="15.5" cy="33.5" rx="5" ry="2.5" fill={leaf} transform="rotate(-30 15.5 33.5)"/>
-                {/* right leaf */}
-                <ellipse cx="35.5" cy="34" rx="7" ry="3.5" fill={leafDk} transform="rotate(30 35.5 34)"/>
-                <ellipse cx="36.5" cy="33.5" rx="5" ry="2.5" fill={leaf} transform="rotate(30 36.5 33.5)"/>
-                {/* head */}
-                <circle cx="26" cy="20" r="10" fill={head}/>
-                {/* eyes */}
-                <circle cx="22.5" cy="19" r="1.5" fill={face}/>
-                <circle cx="29.5" cy="19" r="1.5" fill={face}/>
-                {/* smile */}
-                <path d="M22 23 Q26 27 30 23" stroke={face} strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-            </svg>
-        </div>
-    );
-}
-
-export default function Dashboard({ pomodoroSettings, projects, categories, tasks: initialTasks, goals: initialGoals, todayCount: initialTodayCount, monthTotal: initialMonthTotal, monthCounts: initialMonthCounts, userPoints: initialUserPoints }: Props) {
+export default function Dashboard({ pomodoroSettings, projects, categories, tasks: initialTasks, goals: initialGoals, todayCount: initialTodayCount, monthTotal: initialMonthTotal, monthCounts: initialMonthCounts, userPoints: initialUserPoints, onboardingCompleted }: Props) {
     const { t } = useTranslation();
+    const { flash } = usePage<Props>().props;
+
+    // Onboarding
+    const [onboardingDone, setOnboardingDone] = useState(onboardingCompleted);
 
     // Modals
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [manageOpen, setManageOpen] = useState(false);
     const [goalsOpen, setGoalsOpen] = useState(false);
+    const [victoryWallOpen, setVictoryWallOpen] = useState(false);
+    const [pendingVictoryMessage, setPendingVictoryMessage] = useState<VictoryMessage | null>(null);
 
     // Goals + points state (updated optimistically)
     const [goals, setGoals] = useState<UserGoal[]>(initialGoals);
@@ -205,6 +145,19 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
             setPendingLevelUp(newLevel);
         }
     }, []);
+
+    // Flash awards from Inertia (first project/category created)
+    useEffect(() => {
+        if (flash?.award) {
+            setPendingReward({
+                awards: flash.award.awards,
+                totalEarned: flash.award.total_earned,
+                userPoints: flash.award.user_points,
+            });
+            updateUserPoints(flash.award.user_points);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [flash?.award]);
 
     // Settings
     const [settings, setSettings] = useState<PomodoroSettings>(pomodoroSettings);
@@ -341,10 +294,13 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
 
             // Parse points awards from response
             if (res.ok) {
-                const json = await res.json() as { awards: PointAward[]; total_earned: number; user_points: number };
+                const json = await res.json() as { awards: PointAward[]; total_earned: number; user_points: number; victory_message?: VictoryMessage | null };
                 if (json.total_earned > 0) {
                     updateUserPoints(json.user_points);
                     setPendingReward({ awards: json.awards, totalEarned: json.total_earned, userPoints: json.user_points });
+                }
+                if (json.victory_message) {
+                    setPendingVictoryMessage(json.victory_message);
                 }
             }
         } catch { /* silent — never disrupt UX for a save failure */ }
@@ -489,10 +445,16 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
 
     // Tab title
     useEffect(() => {
-        document.title = timerState !== 'idle'
-            ? formatTitle(remaining, t('app.name'))
-            : `Pomodoro — ${t('app.name')}`;
-    }, [remaining, timerState]);
+        if (timerState === 'idle') {
+            document.title = `Pomodoro — ${t('app.name')}`;
+        } else if (mode === 'break') {
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            document.title = `${t('timer.short_break')} · ${pad(m)}:${pad(s)} — ${t('app.name')}`;
+        } else {
+            document.title = formatTitle(remaining, t('app.name'));
+        }
+    }, [remaining, timerState, mode]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -534,7 +496,6 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
 
     return (
         <>
-        <style>{PLANT_KEYFRAMES}</style>
         <AuthenticatedLayout onManage={() => setManageOpen(true)}>
             <Head title="Pomodoro" />
 
@@ -594,9 +555,18 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                             </div>
                         </div>
 
-                        {/* Growing plant companion — breathes during focus, sways during break */}
-                        <div className="mb-1 flex justify-center">
-                            <GrowingPlant timerState={timerState} isFocus={isFocus} />
+                        {/* Themed mascot + La Flamme button */}
+                        <div className="mb-1 flex items-center justify-center gap-3">
+                            <div className="w-8" />
+                            <TimerIllustration timerState={timerState} isFocus={isFocus} />
+                            <button
+                                type="button"
+                                onClick={() => setVictoryWallOpen(true)}
+                                title="La Flamme"
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-boundary/50 bg-surface/40 text-base transition-all hover:border-ember/50 hover:bg-ember/10 hover:scale-110 active:scale-95"
+                            >
+                                🔥
+                            </button>
                         </div>
 
                         {/* Notification strip — compact, right below the ring */}
@@ -818,8 +788,13 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     );
                 })()}
 
+                {/* ── Social proof strip ── */}
+                <div className="mt-3 w-full max-w-xs">
+                    <SocialProof compact />
+                </div>
+
                 {/* ── Points badge + Goals button ── */}
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2">
                     {/* Points counter pill */}
                     <div className="flex items-center gap-1 rounded-full border border-ember/30 bg-ember/10 px-2.5 py-1">
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-ember/80">
@@ -908,6 +883,22 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     level={pendingLevelUp}
                     onDismiss={() => setPendingLevelUp(null)}
                 />
+            )}
+
+            {victoryWallOpen && (
+                <VictoryWallModal onClose={() => setVictoryWallOpen(false)} />
+            )}
+
+            {pendingVictoryMessage && (
+                <VictoryInspireModal
+                    message={pendingVictoryMessage}
+                    onDismiss={() => setPendingVictoryMessage(null)}
+                    onLiked={() => setPendingVictoryMessage(null)}
+                />
+            )}
+
+            {!onboardingDone && (
+                <OnboardingModal onDismiss={() => setOnboardingDone(true)} />
             )}
         </AuthenticatedLayout>
         </>

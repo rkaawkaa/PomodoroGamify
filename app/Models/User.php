@@ -28,6 +28,7 @@ class User extends Authenticatable
         'auto_start_breaks',
         'auto_start_pomodoros',
         'points',
+        'onboarding_completed',
     ];
 
     /**
@@ -80,6 +81,7 @@ class User extends Authenticatable
             'pomodoro_duration'    => 'integer',
             'break_duration'       => 'integer',
             'points'               => 'integer',
+            'onboarding_completed' => 'boolean',
         ];
     }
 }
