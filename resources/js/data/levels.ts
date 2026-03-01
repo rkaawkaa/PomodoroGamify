@@ -8,29 +8,30 @@ export interface Level {
     color: string;       // tailwind text-color class
     bgColor: string;     // tailwind bg-color class (low opacity)
     borderColor: string; // tailwind border-color class
+    hex: string;         // explicit hex color for inline styles (theme-safe)
 }
 
 export const LEVELS: Level[] = [
-    { level: 1,  minPoints: 0,      color: 'text-amber-600',    bgColor: 'bg-amber-600/10',    borderColor: 'border-amber-600/30'    },
-    { level: 2,  minPoints: 50,     color: 'text-lime-400',     bgColor: 'bg-lime-400/10',     borderColor: 'border-lime-400/30'     },
-    { level: 3,  minPoints: 150,    color: 'text-green-400',    bgColor: 'bg-green-400/10',    borderColor: 'border-green-400/30'    },
-    { level: 4,  minPoints: 300,    color: 'text-emerald-400',  bgColor: 'bg-emerald-400/10',  borderColor: 'border-emerald-400/30'  },
-    { level: 5,  minPoints: 500,    color: 'text-green-500',    bgColor: 'bg-green-500/10',    borderColor: 'border-green-500/30'    },
-    { level: 6,  minPoints: 800,    color: 'text-green-600',    bgColor: 'bg-green-600/10',    borderColor: 'border-green-600/30'    },
-    { level: 7,  minPoints: 1200,   color: 'text-emerald-500',  bgColor: 'bg-emerald-500/10',  borderColor: 'border-emerald-500/30'  },
-    { level: 8,  minPoints: 1800,   color: 'text-pink-400',     bgColor: 'bg-pink-400/10',     borderColor: 'border-pink-400/30'     },
-    { level: 9,  minPoints: 2600,   color: 'text-emerald-600',  bgColor: 'bg-emerald-600/10',  borderColor: 'border-emerald-600/30'  },
-    { level: 10, minPoints: 3600,   color: 'text-rose-400',     bgColor: 'bg-rose-400/10',     borderColor: 'border-rose-400/30'     },
-    { level: 11, minPoints: 5000,   color: 'text-teal-400',     bgColor: 'bg-teal-400/10',     borderColor: 'border-teal-400/30'     },
-    { level: 12, minPoints: 7000,   color: 'text-green-600',    bgColor: 'bg-green-700/10',    borderColor: 'border-green-700/30'    },
-    { level: 13, minPoints: 10000,  color: 'text-lime-500',     bgColor: 'bg-lime-500/10',     borderColor: 'border-lime-500/30'     },
-    { level: 14, minPoints: 14000,  color: 'text-emerald-700',  bgColor: 'bg-emerald-700/10',  borderColor: 'border-emerald-700/30'  },
-    { level: 15, minPoints: 19000,  color: 'text-lime-600',     bgColor: 'bg-lime-600/10',     borderColor: 'border-lime-600/30'     },
-    { level: 16, minPoints: 25000,  color: 'text-amber-500',    bgColor: 'bg-amber-500/10',    borderColor: 'border-amber-500/30'    },
-    { level: 17, minPoints: 33000,  color: 'text-violet-400',   bgColor: 'bg-violet-400/10',   borderColor: 'border-violet-400/30'   },
-    { level: 18, minPoints: 43000,  color: 'text-purple-400',   bgColor: 'bg-purple-400/10',   borderColor: 'border-purple-400/30'   },
-    { level: 19, minPoints: 55000,  color: 'text-cyan-400',     bgColor: 'bg-cyan-400/10',     borderColor: 'border-cyan-400/30'     },
-    { level: 20, minPoints: 70000,  color: 'text-yellow-300',   bgColor: 'bg-yellow-300/10',   borderColor: 'border-yellow-300/30'   },
+    { level: 1,  minPoints: 0,      color: 'text-amber-500',    bgColor: 'bg-amber-500/10',    borderColor: 'border-amber-500/30',    hex: '#f59e0b' },
+    { level: 2,  minPoints: 50,     color: 'text-lime-400',     bgColor: 'bg-lime-400/10',     borderColor: 'border-lime-400/30',     hex: '#a3e635' },
+    { level: 3,  minPoints: 150,    color: 'text-green-400',    bgColor: 'bg-green-400/10',    borderColor: 'border-green-400/30',    hex: '#4ade80' },
+    { level: 4,  minPoints: 300,    color: 'text-emerald-400',  bgColor: 'bg-emerald-400/10',  borderColor: 'border-emerald-400/30',  hex: '#34d399' },
+    { level: 5,  minPoints: 500,    color: 'text-green-400',    bgColor: 'bg-green-400/10',    borderColor: 'border-green-400/30',    hex: '#4ade80' },
+    { level: 6,  minPoints: 800,    color: 'text-emerald-400',  bgColor: 'bg-emerald-400/10',  borderColor: 'border-emerald-400/30',  hex: '#34d399' },
+    { level: 7,  minPoints: 1200,   color: 'text-emerald-500',  bgColor: 'bg-emerald-500/10',  borderColor: 'border-emerald-500/30',  hex: '#10b981' },
+    { level: 8,  minPoints: 1800,   color: 'text-pink-400',     bgColor: 'bg-pink-400/10',     borderColor: 'border-pink-400/30',     hex: '#f472b6' },
+    { level: 9,  minPoints: 2600,   color: 'text-teal-400',     bgColor: 'bg-teal-400/10',     borderColor: 'border-teal-400/30',     hex: '#2dd4bf' },
+    { level: 10, minPoints: 3600,   color: 'text-rose-400',     bgColor: 'bg-rose-400/10',     borderColor: 'border-rose-400/30',     hex: '#fb7185' },
+    { level: 11, minPoints: 5000,   color: 'text-teal-300',     bgColor: 'bg-teal-300/10',     borderColor: 'border-teal-300/30',     hex: '#5eead4' },
+    { level: 12, minPoints: 7000,   color: 'text-lime-400',     bgColor: 'bg-lime-400/10',     borderColor: 'border-lime-400/30',     hex: '#a3e635' },
+    { level: 13, minPoints: 10000,  color: 'text-lime-300',     bgColor: 'bg-lime-300/10',     borderColor: 'border-lime-300/30',     hex: '#bef264' },
+    { level: 14, minPoints: 14000,  color: 'text-emerald-400',  bgColor: 'bg-emerald-400/10',  borderColor: 'border-emerald-400/30',  hex: '#34d399' },
+    { level: 15, minPoints: 19000,  color: 'text-lime-400',     bgColor: 'bg-lime-400/10',     borderColor: 'border-lime-400/30',     hex: '#a3e635' },
+    { level: 16, minPoints: 25000,  color: 'text-amber-400',    bgColor: 'bg-amber-400/10',    borderColor: 'border-amber-400/30',    hex: '#fbbf24' },
+    { level: 17, minPoints: 33000,  color: 'text-violet-400',   bgColor: 'bg-violet-400/10',   borderColor: 'border-violet-400/30',   hex: '#a78bfa' },
+    { level: 18, minPoints: 43000,  color: 'text-purple-400',   bgColor: 'bg-purple-400/10',   borderColor: 'border-purple-400/30',   hex: '#c084fc' },
+    { level: 19, minPoints: 55000,  color: 'text-cyan-400',     bgColor: 'bg-cyan-400/10',     borderColor: 'border-cyan-400/30',     hex: '#22d3ee' },
+    { level: 20, minPoints: 70000,  color: 'text-yellow-300',   bgColor: 'bg-yellow-300/10',   borderColor: 'border-yellow-300/30',   hex: '#fde047' },
 ];
 
 /** Returns the Level object for a given cumulative points total. */

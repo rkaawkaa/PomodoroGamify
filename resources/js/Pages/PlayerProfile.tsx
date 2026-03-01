@@ -56,12 +56,18 @@ export default function PlayerProfile({ userPoints }: Props) {
                     <div className="flex flex-col items-center px-8 pt-8 pb-6">
 
                         {/* Level badge */}
-                        <span className={`mb-5 inline-flex items-center gap-2 rounded-full border-2 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] shadow-lg ${level.color} ${level.borderColor} ${level.bgColor}`}>
+                        <span
+                            className={`mb-5 inline-flex items-center gap-2 rounded-full border-2 px-4 py-1.5 text-xs font-black uppercase tracking-[0.2em] shadow-lg ${level.borderColor} ${level.bgColor}`}
+                            style={{ color: level.hex }}
+                        >
                             ✦ {t('player.level')} {level.level} ✦
                         </span>
 
                         {/* Avatar with glow ring */}
-                        <div className={`relative mb-5 rounded-full border-2 p-3 shadow-xl ${level.borderColor} ${level.bgColor}`}>
+                        <div
+                            className={`relative mb-5 rounded-full border-2 p-3 shadow-xl ${level.borderColor} ${level.bgColor}`}
+                            style={{ boxShadow: `0 0 20px ${level.hex}33` }}
+                        >
                             <PlantAvatar level={level.level} size={108} />
                         </div>
 
@@ -69,13 +75,13 @@ export default function PlayerProfile({ userPoints }: Props) {
                         <h1 className="mb-0.5 text-2xl font-black tracking-tight text-moonbeam">
                             {t(`level.${level.level}`)}
                         </h1>
-                        <p className={`mb-5 text-xs font-semibold uppercase tracking-widest ${level.color} opacity-80`}>
+                        <p className="mb-5 text-xs font-semibold uppercase tracking-widest opacity-90" style={{ color: level.hex }}>
                             {t('player.level')} {level.level}
                         </p>
 
                         {/* Points display */}
                         <div className={`mb-6 flex items-center gap-2 rounded-2xl border px-5 py-3 ${level.borderColor} ${level.bgColor}`}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className={level.color}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style={{ color: level.hex }}>
                                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
                             </svg>
                             <span className="text-xl font-black tabular-nums text-moonbeam">
@@ -93,7 +99,7 @@ export default function PlayerProfile({ userPoints }: Props) {
                                         <span className="text-xs font-semibold text-whisper/70">
                                             {t('player.progress_label').replace(':n', String(next!.level))}
                                         </span>
-                                        <span className={`text-xs font-black tabular-nums ${level.color}`}>
+                                        <span className="text-xs font-black tabular-nums" style={{ color: level.hex }}>
                                             {Math.round(progress * 100)}%
                                         </span>
                                     </div>
@@ -101,8 +107,8 @@ export default function PlayerProfile({ userPoints }: Props) {
                                     {/* Progress bar */}
                                     <div className="mb-1.5 h-2.5 w-full overflow-hidden rounded-full bg-white/8">
                                         <div
-                                            className={`h-full rounded-full transition-all duration-700 ${level.bgColor.replace('/10', '/80')}`}
-                                            style={{ width: `${progress * 100}%` }}
+                                            className="h-full rounded-full transition-all duration-700"
+                                            style={{ width: `${progress * 100}%`, backgroundColor: `${level.hex}cc` }}
                                         />
                                     </div>
 
@@ -112,7 +118,7 @@ export default function PlayerProfile({ userPoints }: Props) {
                                             {rangeEarned.toLocaleString()}
                                             <span className="text-whisper/25"> / {rangeTotal.toLocaleString()} pts</span>
                                         </span>
-                                        <span className={`text-[11px] font-bold tabular-nums ${level.color}`}>
+                                        <span className="text-[11px] font-bold tabular-nums" style={{ color: level.hex }}>
                                             {t('player.pts_remaining').replace(':n', ptsToNext.toLocaleString())}
                                         </span>
                                     </div>
@@ -123,7 +129,10 @@ export default function PlayerProfile({ userPoints }: Props) {
                                     </div>
                                 </>
                             ) : (
-                                <div className={`rounded-2xl border-2 py-3 text-center text-sm font-black tracking-wide ${level.color} ${level.borderColor} ${level.bgColor}`}>
+                                <div
+                                    className={`rounded-2xl border-2 py-3 text-center text-sm font-black tracking-wide ${level.borderColor} ${level.bgColor}`}
+                                    style={{ color: level.hex }}
+                                >
                                     🌟 {t('player.max_level')}
                                 </div>
                             )}
@@ -152,9 +161,10 @@ export default function PlayerProfile({ userPoints }: Props) {
                                         title={`${t('player.level')} ${lvl.level} — ${t(`level.${lvl.level}`)} (${lvl.minPoints.toLocaleString()} pts)`}
                                     >
                                         <PlantAvatar level={lvl.level} size={30} />
-                                        <span className={`text-[10px] font-bold tabular-nums ${
-                                            isCurrent ? lvl.color : isUnlocked ? 'text-moonbeam/70' : 'text-whisper/50'
-                                        }`}>
+                                        <span
+                                            className="text-[10px] font-bold tabular-nums"
+                                            style={{ color: isCurrent ? lvl.hex : undefined }}
+                                        >
                                             {lvl.level}
                                         </span>
                                     </div>
