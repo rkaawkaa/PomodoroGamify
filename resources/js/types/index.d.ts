@@ -1,4 +1,4 @@
-export type Locale = 'en' | 'fr';
+export type Locale = 'en' | 'fr' | 'es' | 'it' | 'pt' | 'de';
 
 export interface PomodoroSettings {
     pomodoro_duration: number;
@@ -35,6 +35,15 @@ export interface UserGoal {
     project?: { id: number; name: string };
 }
 
+export interface VictoryMessage {
+    id: number;
+    content: string;
+    user: { id: number; name: string };
+    likes_count: number;
+    user_liked: boolean;
+    created_at: string;
+}
+
 export interface PointAward {
     event_key: string;
     points: number;
@@ -58,4 +67,11 @@ export type PageProps<
     };
     locale: Locale;
     translations: Record<string, string>;
+    flash?: {
+        award?: {
+            awards: PointAward[];
+            total_earned: number;
+            user_points: number;
+        } | null;
+    };
 };

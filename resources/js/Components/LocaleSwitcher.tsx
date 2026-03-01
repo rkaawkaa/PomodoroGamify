@@ -3,7 +3,7 @@ import { Locale } from '@/types';
 import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
-const SUPPORTED_LOCALES: Locale[] = ['en', 'fr'];
+const SUPPORTED_LOCALES: Locale[] = ['en', 'fr', 'es', 'it', 'pt', 'de'];
 
 interface LocaleSwitcherProps {
     className?: string;
