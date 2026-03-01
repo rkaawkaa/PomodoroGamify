@@ -1,6 +1,12 @@
+import AppFooter from '@/Components/AppFooter';
 import AppLogo from '@/Components/AppLogo';
 import GuestSettingsModal from '@/Components/GuestSettingsModal';
 import GuestTaskList from '@/Components/GuestTaskList';
+import GuestUpsellModal from '@/Components/GuestUpsellModal';
+import LocaleSwitcher from '@/Components/LocaleSwitcher';
+import SocialProof from '@/Components/SocialProof';
+import ThemePicker from '@/Components/ThemePicker';
+import TimerIllustration from '@/Components/TimerIllustration';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps, PomodoroSettings, User } from '@/types';
@@ -77,8 +83,14 @@ export default function Welcome({ auth }: PageProps) {
         DEFAULT_SETTINGS,
     );
 
-    // ── Modal ─────────────────────────────────────────────────────────────
+    // ── Modals ────────────────────────────────────────────────────────────
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    // ── Guest upsell (shown every 5 completed pomodoros) ──────────────────
+    const pomodoroCountRef = useRef(0);
+    const [showUpsellModal, setShowUpsellModal] = useState(false);
+    const userRef = useRef(user);
 
     // ── Timer state machine ───────────────────────────────────────────────
     const [mode, setMode]             = useState<TimerMode>('focus');
@@ -159,6 +171,12 @@ export default function Welcome({ auth }: PageProps) {
     const endFocus = useCallback(() => {
         playSound('focus');
         notifyRef.current(tRef.current('notification.focus_title'), tRef.current('notification.focus_body'));
+        if (!userRef.current) {
+            pomodoroCountRef.current += 1;
+            if (pomodoroCountRef.current % 5 === 0) {
+                setShowUpsellModal(true);
+            }
+        }
         goToBreakRef.current();
     }, []);
 
@@ -232,10 +250,14 @@ export default function Welcome({ auth }: PageProps) {
 
     // Tab title
     useEffect(() => {
-        document.title = timerState !== 'idle'
-            ? `${pad(Math.floor(remaining / 60))}:${pad(remaining % 60)} — ${t('app.name')}`
-            : `Pomodoro — ${t('app.name')}`;
-    }, [remaining, timerState]);
+        if (timerState === 'idle') {
+            document.title = `Pomodoro — ${t('app.name')}`;
+        } else if (mode === 'break') {
+            document.title = `${t('timer.short_break')} · ${pad(Math.floor(remaining / 60))}:${pad(remaining % 60)} — ${t('app.name')}`;
+        } else {
+            document.title = `${pad(Math.floor(remaining / 60))}:${pad(remaining % 60)} — ${t('app.name')}`;
+        }
+    }, [remaining, timerState, mode]);
 
     useEffect(() => {
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
@@ -265,45 +287,118 @@ export default function Welcome({ auth }: PageProps) {
 
     return (
         <>
-            <Head title={`Pomodoro — ${t('app.name')}`} />
+            <Head>
+                <title>PomoBloom — Free Pomodoro Timer with Gamification</title>
+                <meta name="description" content="Free Pomodoro timer with gamification. Earn points, level up, and track your focus sessions. Build consistent productivity habits — no account required." />
+                <meta name="keywords" content="pomodoro timer, productivity app, gamification, focus timer, time management, pomodoro technique, work sessions, level up, free timer" />
+                <meta property="og:type" content="website" />
+                <meta property="og:title" content="PomoBloom — Free Pomodoro Timer with Gamification" />
+                <meta property="og:description" content="Free Pomodoro timer with gamification. Earn points, level up, and track your focus sessions. Build consistent productivity habits." />
+                <meta property="og:site_name" content="PomoBloom" />
+                <meta property="og:locale" content="en_US" />
+                <meta name="twitter:card" content="summary" />
+                <meta name="twitter:title" content="PomoBloom — Free Pomodoro Timer with Gamification" />
+                <meta name="twitter:description" content="Free Pomodoro timer with gamification. Earn points, level up, track your focus sessions." />
+                <meta name="robots" content="index, follow" />
+            </Head>
 
             <div className="flex min-h-screen flex-col bg-abyss bg-gradient-to-b from-ember/[0.10] via-transparent to-bloom/[0.07]">
 
                 {/* ── Top bar ─────────────────────────────────────────────── */}
-                <header className="flex items-center justify-between px-6 py-4">
-                    <div className="flex items-center gap-2.5 text-ember">
-                        <AppLogo size={22} />
-                        <span className="text-sm font-bold tracking-tight text-moonbeam">
-                            {t('app.name')}
-                        </span>
-                    </div>
+                <div className="relative">
+                    <header className="flex items-center justify-between px-6 py-4">
+                        <div className="flex items-center gap-2.5 text-ember">
+                            <AppLogo size={22} />
+                            <span className="text-sm font-bold tracking-tight text-moonbeam">
+                                {t('app.name')}
+                            </span>
+                        </div>
 
-                    <nav className="flex items-center gap-2">
-                        {user ? (
-                            <Link
-                                href={route('dashboard')}
-                                className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1.5 text-xs font-semibold text-ember transition-all hover:bg-ember/20"
-                            >
-                                {t('nav.dashboard')} →
+                        {/* Desktop nav */}
+                        <nav className="hidden items-center gap-3 md:flex">
+                            <Link href={route('help')} title={t('nav.help')} className="text-whisper/60 transition-colors hover:text-moonbeam">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                                </svg>
                             </Link>
-                        ) : (
-                            <>
-                                <Link
-                                    href={route('login')}
-                                    className="rounded-full border border-boundary/60 px-3 py-1.5 text-xs font-medium text-whisper transition-all hover:border-whisper/50 hover:text-moonbeam"
-                                >
-                                    {t('nav.login')}
+                            <span className="select-none text-boundary/60">|</span>
+                            <LocaleSwitcher />
+                            <span className="select-none text-boundary/60">|</span>
+                            <ThemePicker />
+                            <span className="select-none text-boundary/60">|</span>
+                            {user ? (
+                                <Link href={route('dashboard')} className="rounded-full border border-ember/40 bg-ember/10 px-3 py-1.5 text-xs font-semibold text-ember transition-all hover:bg-ember/20">
+                                    {t('nav.dashboard')} →
                                 </Link>
+                            ) : (
+                                <>
+                                    <Link href={route('login')} className="rounded-full border border-boundary/60 px-3 py-1.5 text-xs font-medium text-whisper transition-all hover:border-whisper/50 hover:text-moonbeam">
+                                        {t('nav.login')}
+                                    </Link>
+                                    <Link href={route('register')} className="rounded-full bg-ember px-3 py-1.5 text-xs font-semibold text-white transition-all hover:brightness-110">
+                                        {t('nav.register')}
+                                    </Link>
+                                </>
+                            )}
+                        </nav>
+
+                        {/* Mobile hamburger */}
+                        <button
+                            type="button"
+                            className="flex items-center justify-center text-whisper/60 transition-colors hover:text-moonbeam md:hidden"
+                            onClick={() => setMenuOpen((v) => !v)}
+                            aria-label="Menu"
+                        >
+                            {menuOpen ? (
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                    <path d="M6 6l12 12M18 6L6 18" />
+                                </svg>
+                            ) : (
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                    <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
+                                </svg>
+                            )}
+                        </button>
+                    </header>
+
+                    {/* Mobile dropdown */}
+                    {menuOpen && (
+                        <div className="absolute left-0 right-0 top-full z-50 border-b border-boundary/40 bg-depth/95 px-6 py-5 shadow-xl shadow-black/40 backdrop-blur-sm md:hidden">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-center gap-3">
+                                    <LocaleSwitcher />
+                                    <span className="select-none text-boundary/40">|</span>
+                                    <ThemePicker />
+                                </div>
                                 <Link
-                                    href={route('register')}
-                                    className="rounded-full bg-ember px-3 py-1.5 text-xs font-semibold text-white transition-all hover:brightness-110"
+                                    href={route('help')}
+                                    onClick={() => setMenuOpen(false)}
+                                    className="flex items-center gap-2 text-sm text-whisper/60 transition-colors hover:text-moonbeam"
                                 >
-                                    {t('nav.register')}
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" /><line x1="12" y1="17" x2="12.01" y2="17" />
+                                    </svg>
+                                    {t('nav.help')}
                                 </Link>
-                            </>
-                        )}
-                    </nav>
-                </header>
+                                <div className="h-px bg-boundary/30" />
+                                {user ? (
+                                    <Link href={route('dashboard')} onClick={() => setMenuOpen(false)} className="rounded-full border border-ember/40 bg-ember/10 px-4 py-2 text-center text-sm font-semibold text-ember transition-all hover:bg-ember/20">
+                                        {t('nav.dashboard')} →
+                                    </Link>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <Link href={route('login')} onClick={() => setMenuOpen(false)} className="flex-1 rounded-full border border-boundary/60 px-3 py-2 text-center text-sm font-medium text-whisper transition-all hover:text-moonbeam">
+                                            {t('nav.login')}
+                                        </Link>
+                                        <Link href={route('register')} onClick={() => setMenuOpen(false)} className="flex-1 rounded-full bg-ember px-3 py-2 text-center text-sm font-semibold text-white transition-all hover:brightness-110">
+                                            {t('nav.register')}
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 {/* ── Timer area ──────────────────────────────────────────── */}
                 <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-4">
@@ -359,6 +454,11 @@ export default function Welcome({ auth }: PageProps) {
                                         {pad(minutes)}:{pad(seconds)}
                                     </span>
                                 </div>
+                            </div>
+
+                            {/* Themed mascot companion */}
+                            <div className="mb-1 flex justify-center">
+                                <TimerIllustration timerState={timerState} isFocus={isFocus} />
                             </div>
 
                             {/* Notification strip */}
@@ -469,24 +569,19 @@ export default function Welcome({ auth }: PageProps) {
                         </div>
                     </div>
 
-                    {/* Upsell banner — outside the timer card, guests only */}
+                    {/* Social proof + upsell — outside the timer card, guests only */}
                     {!user && (
-                        <div className="mt-5 w-full max-w-xs rounded-2xl border border-boundary/50 bg-surface/20 px-5 py-4 text-center">
-                            <p className="mb-3 text-[11px] leading-relaxed text-whisper/60">
-                                {locale === 'fr'
-                                    ? 'Crée un compte gratuit pour sauvegarder tes sessions, gérer projets & catégories et suivre tes stats.'
-                                    : 'Create a free account to save your sessions, manage projects & categories, and track your stats.'}
-                            </p>
-                            <Link
-                                href={route('register')}
-                                className="inline-block rounded-full bg-ember px-5 py-1.5 text-xs font-semibold text-white transition-all hover:brightness-110"
-                            >
-                                {t('auth.register.submit')} →
-                            </Link>
+                        <div className="mt-5 flex flex-col items-center gap-3">
+                            <SocialProof showCta />
                         </div>
                     )}
                 </main>
             </div>
+
+            {/* Guest upsell modal */}
+            {showUpsellModal && (
+                <GuestUpsellModal onDismiss={() => setShowUpsellModal(false)} />
+            )}
 
             {/* Settings modal */}
             {settingsOpen && (
@@ -505,6 +600,8 @@ export default function Welcome({ auth }: PageProps) {
                     }}
                 />
             )}
+
+            <AppFooter />
         </>
     );
 }

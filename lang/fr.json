@@ -11,6 +11,7 @@
     "nav.login": "Se connecter",
     "nav.register": "S'inscrire",
     "nav.manage": "Gérer mes projets et catégories",
+    "nav.help": "Aide & Articles",
 
     "auth.login": "Se connecter",
     "auth.login.title": "Bon retour",
@@ -120,6 +121,10 @@
 
     "locale.en": "English",
     "locale.fr": "Français",
+    "locale.es": "Español",
+    "locale.it": "Italiano",
+    "locale.pt": "Português",
+    "locale.de": "Deutsch",
 
     "mail.welcome.subject": "Bienvenue sur PomoBloom 🌸",
     "mail.welcome.greeting": "Bonjour :name,",
@@ -148,7 +153,7 @@
     "settings.cancel": "Annuler",
     "settings.saved": "Enregistré",
 
-    "project.label": "Projets",
+    "project.label": "Projet",
     "project.none": "Aucun projet",
     "project.create_new": "Nouveau projet...",
     "project.name_placeholder": "Nom du projet",
@@ -209,6 +214,9 @@
     "points.milestone_category_hours_100": "100h dans cette catégorie !",
     "points.milestone_category_hours_500": "500h dans cette catégorie !",
     "points.random_reward": "Récompense surprise 🎲",
+    "points.first_project": "Premier projet créé ! 📁",
+    "points.first_category": "Première catégorie créée ! 🏷️",
+    "points.first_linked_pomodoro": "Premier pomodoro lié ! 🔗",
 
     "goals.title": "Objectifs",
     "goals.button": "Objectifs",
@@ -312,5 +320,21 @@
     "stats.lb_encourage_10": "Tu es dans le top 10 !",
     "stats.lb_encourage_other": "Continue, tu grimpes au classement !",
     "stats.lb_empty": "Aucune session cette semaine. Lance-toi !",
-    "stats.you": "toi"
+    "stats.you": "toi",
+
+    "footer.legal": "Mentions légales",
+    "footer.privacy": "Confidentialité",
+    "footer.help": "Aide",
+
+    "legal.title": "Mentions légales",
+    "legal.company": "Éditeur",
+    "legal.hosting": "Hébergement",
+    "legal.contact": "Contact",
+
+    "privacy.title": "Politique de confidentialité",
+    "privacy.intro": "Nous nous engageons à protéger vos données personnelles.",
+    "privacy.data_collected": "Données collectées",
+    "privacy.data_use": "Utilisation de vos données",
+    "privacy.rights": "Vos droits",
+    "privacy.contact": "Contact"
 }
