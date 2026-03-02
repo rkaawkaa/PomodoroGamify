@@ -56,7 +56,7 @@ export default function Login({
                 >
                     <TextInput
                         id="email"
-                        type="email"
+                        type="text"
                         name="email"
                         value={data.email}
                         autoComplete="username"

@@ -16,7 +16,7 @@
     "auth.login": "Log in",
     "auth.login.title": "Welcome back",
     "auth.login.subtitle": "Log in to continue your focus journey",
-    "auth.login.email": "Email address",
+    "auth.login.email": "Email or username",
     "auth.login.password": "Password",
     "auth.login.remember": "Remember me",
     "auth.login.forgot": "Forgot your password?",

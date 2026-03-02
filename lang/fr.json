@@ -16,7 +16,7 @@
     "auth.login": "Se connecter",
     "auth.login.title": "Bon retour",
     "auth.login.subtitle": "Connectez-vous pour continuer votre parcours de focus",
-    "auth.login.email": "Adresse e-mail",
+    "auth.login.email": "Adresse e-mail ou nom d'utilisateur",
     "auth.login.password": "Mot de passe",
     "auth.login.remember": "Se souvenir de moi",
     "auth.login.forgot": "Mot de passe oublié ?",
