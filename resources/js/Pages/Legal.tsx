@@ -77,8 +77,8 @@ export default function Legal() {
                             <h2 className="mb-3 text-base font-bold text-moonbeam">{t('legal.contact')}</h2>
                             <p>
                                 Pour toute question relative aux présentes mentions légales,
-                                vous pouvez nous contacter via la page{' '}
-                                <Link href={route('help')} className="text-ember hover:underline">{t('nav.help')}</Link>.
+                                vous pouvez nous contacter à{' '}
+                                <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">support@pomobloom.com</a>.
                             </p>
                         </section>
 

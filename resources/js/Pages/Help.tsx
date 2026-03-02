@@ -371,6 +371,21 @@ export default function Help({ auth }: PageProps) {
                     ))}
                 </section>
 
+                {/* ── Contact ─────────────────────────────────────────────── */}
+                <section className="mx-auto w-full max-w-3xl px-4 pb-8 sm:px-6">
+                    <div className="rounded-3xl border border-boundary/30 bg-surface/10 px-6 py-5 sm:px-8">
+                        <p className="text-sm font-semibold text-moonbeam">
+                            {isFr ? 'Une question ? Un problème ?' : 'A question? An issue?'}
+                        </p>
+                        <p className="mt-1 text-sm text-whisper/55">
+                            {isFr ? 'Contacte-nous à ' : 'Reach us at '}
+                            <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">
+                                support@pomobloom.com
+                            </a>
+                        </p>
+                    </div>
+                </section>
+
                 {/* ── Footer CTA ──────────────────────────────────────────── */}
                 {!user && (
                     <div className="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">

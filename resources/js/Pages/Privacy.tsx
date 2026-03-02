@@ -103,8 +103,8 @@ export default function Privacy() {
                             <h2 className="mb-3 text-base font-bold text-moonbeam">{t('privacy.contact')}</h2>
                             <p>
                                 Pour exercer vos droits ou pour toute question relative à la protection de vos données,
-                                contactez-nous via la page{' '}
-                                <Link href={route('help')} className="text-ember hover:underline">{t('nav.help')}</Link>.
+                                contactez-nous à{' '}
+                                <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">support@pomobloom.com</a>.
                             </p>
                         </section>
 

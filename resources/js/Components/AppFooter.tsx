@@ -36,6 +36,13 @@ export default function AppFooter() {
                     >
                         {t('footer.help')}
                     </Link>
+                    <span className="select-none text-boundary/30">·</span>
+                    <a
+                        href="mailto:support@pomobloom.com"
+                        className="text-[11px] text-whisper/40 transition-colors hover:text-whisper/70"
+                    >
+                        {t('footer.contact')}
+                    </a>
                 </nav>
             </div>
         </footer>
