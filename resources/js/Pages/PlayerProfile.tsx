@@ -2,8 +2,9 @@ import PlantAvatar from '@/Components/PlantAvatar';
 import { useTranslation } from '@/hooks/useTranslation';
 import { getLevelForPoints, getLevelProgress, getNextLevel, LEVELS } from '@/data/levels';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { PageProps, User } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useRef, useState } from 'react';
 
 type Props = PageProps<{
     userPoints: number;
@@ -11,14 +12,55 @@ type Props = PageProps<{
 
 export default function PlayerProfile({ userPoints }: Props) {
     const { t } = useTranslation();
+    const { auth } = usePage<Props>().props;
+    const user = auth.user as User;
 
+    // ── Username edit ─────────────────────────────────────────────────────
+    const [editing, setEditing]         = useState(false);
+    const [nameValue, setNameValue]     = useState('');
+    const [saving, setSaving]           = useState(false);
+    const [nameError, setNameError]     = useState('');
+    const [nameSuccess, setNameSuccess] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const startEditing = () => {
+        setNameValue(user.name);
+        setNameError('');
+        setNameSuccess(false);
+        setEditing(true);
+        setTimeout(() => inputRef.current?.focus(), 50);
+    };
+
+    const cancelEditing = () => { setEditing(false); setNameError(''); };
+
+    const saveName = () => {
+        if (saving) return;
+        setSaving(true);
+        setNameError('');
+        router.patch(route('profile.update'), { name: nameValue, email: user.email }, {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                setSaving(false);
+                setEditing(false);
+                setNameSuccess(true);
+                setTimeout(() => setNameSuccess(false), 3000);
+            },
+            onError: (errors) => {
+                setSaving(false);
+                setNameError(errors.name ?? errors.email ?? t('common.error'));
+            },
+        });
+    };
+
+    // ── Level data ────────────────────────────────────────────────────────
     const level = getLevelForPoints(userPoints);
     const next = getNextLevel(level);
     const progress = getLevelProgress(userPoints);
     const isMaxLevel = !next;
-    const ptsToNext    = next ? next.minPoints - userPoints : 0;
-    const rangeTotal   = next ? next.minPoints - level.minPoints : 0;
-    const rangeEarned  = next ? userPoints - level.minPoints : 0;
+    const ptsToNext  = next ? next.minPoints - userPoints : 0;
+    const rangeTotal = next ? next.minPoints - level.minPoints : 0;
+    const rangeEarned = next ? userPoints - level.minPoints : 0;
 
     return (
         <AuthenticatedLayout>
@@ -30,7 +72,7 @@ export default function PlayerProfile({ userPoints }: Props) {
                 <div className="mb-6 w-full max-w-sm">
                     <Link
                         href={route('dashboard')}
-                        className="flex items-center gap-1.5 text-xs font-medium text-whisper/50 transition-colors hover:text-moonbeam"
+                        className="flex items-center gap-1.5 text-xs font-medium text-whisper/70 transition-colors hover:text-moonbeam"
                     >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M19 12H5M12 5l-7 7 7 7"/>
@@ -47,13 +89,83 @@ export default function PlayerProfile({ userPoints }: Props) {
                     <div className={`h-1 w-full ${level.bgColor.replace('/10', '')} opacity-70`}
                         style={{ background: `linear-gradient(90deg, transparent, currentColor, transparent)` }}
                     />
-                    {/* Inline glow line fallback */}
                     <div className={`-mt-1 h-1 w-full bg-gradient-to-r from-transparent via-current to-transparent ${level.color} opacity-60`}/>
 
                     {/* Ambient shimmer */}
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/4 via-transparent to-white/2"/>
 
                     <div className="flex flex-col items-center px-8 pt-8 pb-6">
+
+                        {/* ── Username + email ── */}
+                        <div className="mb-5 w-full rounded-xl border border-white/8 bg-white/4 px-4 py-3">
+                            {/* Username row */}
+                            <div className="flex items-center gap-2">
+                                {editing ? (
+                                    <>
+                                        <input
+                                            ref={inputRef}
+                                            type="text"
+                                            value={nameValue}
+                                            onChange={(e) => setNameValue(e.target.value)}
+                                            onKeyDown={(e) => { if (e.key === 'Enter') saveName(); if (e.key === 'Escape') cancelEditing(); }}
+                                            maxLength={30}
+                                            className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/8 px-2 py-1 text-sm font-semibold text-moonbeam outline-none focus:border-ember/50"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={saveName}
+                                            disabled={saving}
+                                            className="flex h-6 w-6 items-center justify-center rounded-full bg-ember/20 text-ember transition-colors hover:bg-ember/35 disabled:opacity-50"
+                                            title="Sauvegarder"
+                                        >
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                <polyline points="20 6 9 17 4 12"/>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={cancelEditing}
+                                            className="flex h-6 w-6 items-center justify-center rounded-full bg-white/8 text-whisper/60 transition-colors hover:bg-white/15 hover:text-moonbeam"
+                                            title="Annuler"
+                                        >
+                                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                                                <path d="M6 6l12 12M18 6L6 18"/>
+                                            </svg>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className="min-w-0 flex-1 truncate text-sm font-bold text-moonbeam">
+                                            {user.name}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={startEditing}
+                                            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/5 text-whisper/50 transition-colors hover:bg-white/12 hover:text-moonbeam"
+                                            title="Modifier le nom d'utilisateur"
+                                        >
+                                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                            </svg>
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+
+                            {/* Feedback */}
+                            {nameError && (
+                                <p className="mt-1.5 text-[11px] text-ember/90">{nameError}</p>
+                            )}
+                            {nameSuccess && (
+                                <p className="mt-1.5 text-[11px] text-bloom">{t('common.success')} ✓</p>
+                            )}
+
+                            {/* Email row */}
+                            <div className="mt-1.5 truncate text-[11px] text-whisper/55">
+                                {user.email}
+                            </div>
+                        </div>
 
                         {/* Level badge */}
                         <span
@@ -94,7 +206,6 @@ export default function PlayerProfile({ userPoints }: Props) {
                         <div className="w-full">
                             {!isMaxLevel ? (
                                 <>
-                                    {/* Header: label + % */}
                                     <div className="mb-2 flex items-center justify-between">
                                         <span className="text-xs font-semibold text-whisper/70">
                                             {t('player.progress_label').replace(':n', String(next!.level))}
@@ -103,16 +214,12 @@ export default function PlayerProfile({ userPoints }: Props) {
                                             {Math.round(progress * 100)}%
                                         </span>
                                     </div>
-
-                                    {/* Progress bar */}
                                     <div className="mb-1.5 h-2.5 w-full overflow-hidden rounded-full bg-white/8">
                                         <div
                                             className="h-full rounded-full transition-all duration-700"
                                             style={{ width: `${progress * 100}%`, backgroundColor: `${level.hex}cc` }}
                                         />
                                     </div>
-
-                                    {/* Range info: earned / total  ·  X pts remaining */}
                                     <div className="flex items-center justify-between">
                                         <span className="text-[11px] text-whisper/45">
                                             {rangeEarned.toLocaleString()}
@@ -122,8 +229,6 @@ export default function PlayerProfile({ userPoints }: Props) {
                                             {t('player.pts_remaining').replace(':n', ptsToNext.toLocaleString())}
                                         </span>
                                     </div>
-
-                                    {/* Next level total threshold */}
                                     <div className="mt-1.5 text-center text-[10px] text-whisper/30">
                                         {t('player.next_level_label')} {next!.level} — {next!.minPoints.toLocaleString()} pts
                                     </div>
