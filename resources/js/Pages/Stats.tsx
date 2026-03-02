@@ -110,7 +110,7 @@ function StatCell({ label, value, accent }: { label: string; value: string; acce
     return (
         <div className="flex flex-col items-center justify-center py-3 text-center">
             <span className={`text-xl font-black tabular-nums leading-none ${accent}`}>{value}</span>
-            <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-whisper/35">{label}</span>
+            <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-whisper/60">{label}</span>
         </div>
     );
 }
@@ -129,7 +129,7 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
             <div className="w-6 shrink-0 text-center">
                 {medal
                     ? <span className="text-sm leading-none">{medal}</span>
-                    : <span className="text-[11px] font-bold text-whisper/25">#{rank}</span>
+                    : <span className="text-[11px] font-bold text-whisper/50">#{rank}</span>
                 }
             </div>
             <div className={`flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full border ${level.borderColor} ${level.bgColor}`}>
@@ -142,11 +142,11 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
                 {isCurrentUser && (
                     <span className="ml-1.5 text-[9px] font-bold text-ember/50">{t('stats.you')}</span>
                 )}
-                <div className={`text-[9px] ${level.color} opacity-60`}>nv.{level.level}</div>
+                <div className={`text-[9px] ${level.color} opacity-80`}>nv.{level.level}</div>
             </div>
             <div className="shrink-0 text-right">
                 <span className="text-sm font-black tabular-nums text-moonbeam/85">{entry.sessions}</span>
-                <span className="ml-0.5 text-[9px] text-whisper/30">sess.</span>
+                <span className="ml-0.5 text-[9px] text-whisper/55">sess.</span>
             </div>
         </div>
     );
@@ -197,14 +197,14 @@ export default function Stats({
                 <div className="mb-4 flex items-center gap-3">
                     <Link
                         href={route('dashboard')}
-                        className="flex items-center gap-1.5 text-[11px] text-whisper/40 transition-colors hover:text-moonbeam"
+                        className="flex items-center gap-1.5 text-[11px] text-whisper/65 transition-colors hover:text-moonbeam"
                     >
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M19 12H5M12 5l-7 7 7 7"/>
                         </svg>
                         {t('common.back')}
                     </Link>
-                    <span className="text-whisper/15">·</span>
+                    <span className="text-whisper/35">·</span>
                     <h1 className="text-sm font-bold tracking-tight text-moonbeam/80">
                         {t('stats.page_title')}
                     </h1>
@@ -222,7 +222,7 @@ export default function Stats({
                                 className={`rounded-md px-2.5 py-1 text-[10px] font-semibold transition-all ${
                                     filters.period === p.key
                                         ? 'bg-ember/80 text-white shadow'
-                                        : 'text-whisper/40 hover:text-whisper/70'
+                                        : 'text-whisper/65 hover:text-moonbeam'
                                 }`}
                             >
                                 {p.label}
@@ -259,7 +259,7 @@ export default function Stats({
                             className={`flex-1 rounded-md py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all ${
                                 tab === t_
                                     ? 'bg-depth text-moonbeam shadow'
-                                    : 'text-whisper/35 hover:text-whisper/60'
+                                    : 'text-whisper/60 hover:text-moonbeam'
                             }`}
                         >
                             {t_ === 'overview'    && t('stats.tab_overview')}
@@ -287,7 +287,7 @@ export default function Stats({
                             {/* Daily */}
                             <div className="rounded-xl border border-white/8 bg-surface/20 p-3">
                                 <div className="mb-1 flex items-center justify-between">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/35">
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/60">
                                         {t('stats.chart_14_days')}
                                     </span>
                                     {!dailyChart.every((d) => d.sessions === 0) && (
@@ -297,7 +297,7 @@ export default function Stats({
                                     )}
                                 </div>
                                 {dailyChart.every((d) => d.sessions === 0) ? (
-                                    <p className="py-4 text-center text-[10px] text-whisper/25">{t('stats.no_data')}</p>
+                                    <p className="py-4 text-center text-[10px] text-whisper/50">{t('stats.no_data')}</p>
                                 ) : (
                                     <div className="h-8">
                                         <MiniBarChart
@@ -309,7 +309,7 @@ export default function Stats({
                                         />
                                     </div>
                                 )}
-                                <div className="mt-1 flex justify-between text-[8px] text-whisper/25">
+                                <div className="mt-1 flex justify-between text-[8px] text-whisper/50">
                                     <span>{dailyChart[0]?.label}</span>
                                     <span>{dailyChart[dailyChart.length - 1]?.label}</span>
                                 </div>
@@ -318,7 +318,7 @@ export default function Stats({
                             {/* Weekly */}
                             <div className="rounded-xl border border-white/8 bg-surface/20 p-3">
                                 <div className="mb-1 flex items-center justify-between">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/35">
+                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/60">
                                         {t('stats.chart_8_weeks')}
                                     </span>
                                     {!weeklyChart.every((w) => w.sessions === 0) && (
@@ -328,7 +328,7 @@ export default function Stats({
                                     )}
                                 </div>
                                 {weeklyChart.every((w) => w.sessions === 0) ? (
-                                    <p className="py-4 text-center text-[10px] text-whisper/25">{t('stats.no_data')}</p>
+                                    <p className="py-4 text-center text-[10px] text-whisper/50">{t('stats.no_data')}</p>
                                 ) : (
                                     <div className="h-8">
                                         <MiniBarChart
@@ -341,7 +341,7 @@ export default function Stats({
                                         />
                                     </div>
                                 )}
-                                <div className="mt-1 flex justify-between text-[8px] text-whisper/25">
+                                <div className="mt-1 flex justify-between text-[8px] text-whisper/50">
                                     <span>{weeklyChart[0]?.label}</span>
                                     <span>{weeklyChart[weeklyChart.length - 1]?.label}</span>
                                 </div>
@@ -355,7 +355,7 @@ export default function Stats({
                     <div className="space-y-2">
                         <div className="overflow-hidden rounded-xl border border-white/8 bg-surface/20">
                             {history.data.length === 0 ? (
-                                <p className="py-10 text-center text-xs text-whisper/30">{t('stats.history_empty')}</p>
+                                <p className="py-10 text-center text-xs text-whisper/55">{t('stats.history_empty')}</p>
                             ) : (
                                 history.data.map((s) => <HistoryRow key={s.id} session={s} t={t} />)
                             )}
@@ -366,16 +366,16 @@ export default function Stats({
                                     type="button"
                                     disabled={history.current_page <= 1}
                                     onClick={() => applyFilter({ history_page: history.current_page - 1 })}
-                                    className="rounded-lg border border-white/8 bg-surface/20 px-3 py-1.5 text-[10px] text-whisper/40 transition-colors hover:text-moonbeam disabled:opacity-25"
+                                    className="rounded-lg border border-white/8 bg-surface/20 px-3 py-1.5 text-[10px] text-whisper/65 transition-colors hover:text-moonbeam disabled:opacity-25"
                                 >← {t('stats.history_prev')}</button>
-                                <span className="text-[10px] text-whisper/30">
+                                <span className="text-[10px] text-whisper/55">
                                     {t('stats.history_page').replace(':cur', String(history.current_page)).replace(':last', String(history.last_page))}
                                 </span>
                                 <button
                                     type="button"
                                     disabled={history.current_page >= history.last_page}
                                     onClick={() => applyFilter({ history_page: history.current_page + 1 })}
-                                    className="rounded-lg border border-white/8 bg-surface/20 px-3 py-1.5 text-[10px] text-whisper/40 transition-colors hover:text-moonbeam disabled:opacity-25"
+                                    className="rounded-lg border border-white/8 bg-surface/20 px-3 py-1.5 text-[10px] text-whisper/65 transition-colors hover:text-moonbeam disabled:opacity-25"
                                 >{t('stats.history_next')} →</button>
                             </div>
                         )}
@@ -394,7 +394,7 @@ export default function Stats({
                                         type="button"
                                         onClick={() => setLbPeriod(p)}
                                         className={`rounded-md px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all ${
-                                            lbPeriod === p ? 'bg-depth text-moonbeam shadow' : 'text-whisper/35 hover:text-whisper/60'
+                                            lbPeriod === p ? 'bg-depth text-moonbeam shadow' : 'text-whisper/60 hover:text-moonbeam'
                                         }`}
                                     >
                                         {p === 'weekly' ? t('stats.lb_weekly') : t('stats.lb_monthly')}
@@ -416,7 +416,7 @@ export default function Stats({
                         {/* Rankings */}
                         <div className="overflow-hidden rounded-xl border border-white/8 bg-surface/20 p-1.5">
                             {lbEntries.length === 0 ? (
-                                <p className="py-8 text-center text-xs text-whisper/30">{t('stats.lb_empty')}</p>
+                                <p className="py-8 text-center text-xs text-whisper/55">{t('stats.lb_empty')}</p>
                             ) : (
                                 <div className="space-y-0.5">
                                     {lbEntries.slice(0, 10).map((entry, i) => (
@@ -429,7 +429,7 @@ export default function Stats({
                                     ))}
                                     {myRank > 10 && myLbIndex >= 0 && (
                                         <>
-                                            <div className="py-0.5 text-center text-[10px] text-whisper/20">· · ·</div>
+                                            <div className="py-0.5 text-center text-[10px] text-whisper/45">· · ·</div>
                                             {lbEntries
                                                 .slice(Math.max(10, myLbIndex - 2), Math.min(lbEntries.length, myLbIndex + 3))
                                                 .map((entry, i) => (
@@ -446,7 +446,7 @@ export default function Stats({
                             )}
                         </div>
                         {myRank === 0 && lbEntries.length > 0 && (
-                            <p className="text-center text-[11px] text-whisper/30">{t('stats.lb_not_ranked')}</p>
+                            <p className="text-center text-[11px] text-whisper/55">{t('stats.lb_not_ranked')}</p>
                         )}
                     </div>
                 )}
@@ -462,8 +462,8 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
         <div className="flex items-center gap-3 border-b border-white/5 px-3 py-2.5 last:border-0">
             {/* Date/time */}
             <div className="w-16 shrink-0 text-right">
-                <div className="text-[10px] font-semibold text-moonbeam/60">{fmtDate(session.ended_at)}</div>
-                <div className="text-[9px] text-whisper/30">{fmtTime(session.ended_at)}</div>
+                <div className="text-[10px] font-semibold text-moonbeam/80">{fmtDate(session.ended_at)}</div>
+                <div className="text-[9px] text-whisper/55">{fmtTime(session.ended_at)}</div>
             </div>
 
             {/* Tags */}
@@ -479,7 +479,7 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
                     ))}
                 </div>
                 {session.tasks_count > 0 && (
-                    <div className="text-[9px] text-whisper/30">
+                    <div className="text-[9px] text-whisper/55">
                         ✓ {session.tasks_count} {session.tasks_count === 1
                             ? t('stats.history_tasks').split('|')[0]
                             : t('stats.history_tasks').split('|')[1]}
@@ -488,7 +488,7 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
             </div>
 
             {/* Duration */}
-            <span className="shrink-0 font-mono text-[11px] font-bold text-ember/60">
+            <span className="shrink-0 font-mono text-[11px] font-bold text-ember/80">
                 {fmtSeconds(session.duration_seconds)}
             </span>
         </div>

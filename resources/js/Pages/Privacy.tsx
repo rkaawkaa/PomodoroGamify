@@ -31,7 +31,7 @@ export default function Privacy() {
 
                 <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-12">
 
-                    <Link href={route('welcome')} className="mb-8 flex items-center gap-1.5 text-xs text-whisper/50 transition-colors hover:text-moonbeam">
+                    <Link href={route('welcome')} className="mb-8 flex items-center gap-1.5 text-xs text-whisper/70 transition-colors hover:text-moonbeam">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M19 12H5M12 5l-7 7 7 7"/>
                         </svg>
