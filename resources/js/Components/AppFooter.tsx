@@ -1,8 +1,10 @@
+import { PageProps } from '@/types';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function AppFooter() {
     const { t } = useTranslation();
+    const { support_email } = usePage<PageProps>().props;
     const year = new Date().getFullYear();
 
     return (
@@ -38,7 +40,7 @@ export default function AppFooter() {
                     </Link>
                     <span className="select-none text-boundary/30">·</span>
                     <a
-                        href="mailto:support@pomobloom.com"
+                        href={`mailto:${support_email}`}
                         className="text-[11px] text-whisper/40 transition-colors hover:text-whisper/70"
                     >
                         {t('footer.contact')}

@@ -35,9 +35,10 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'locale'       => app()->getLocale(),
-            'translations' => $this->loadTranslations(),
-            'flash'        => fn () => ['award' => session('award')],
+            'locale'        => app()->getLocale(),
+            'translations'  => $this->loadTranslations(),
+            'flash'         => fn () => ['award' => session('award')],
+            'support_email' => env('MAIL_SUPPORT', 'pomosupport@pomobloom.com'),
         ];
     }
 

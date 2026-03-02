@@ -3,10 +3,12 @@ import AppLogo from '@/Components/AppLogo';
 import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import ThemePicker from '@/Components/ThemePicker';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Head, Link } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Privacy() {
     const { t } = useTranslation();
+    const { support_email } = usePage<PageProps>().props;
 
     return (
         <>
@@ -104,7 +106,7 @@ export default function Privacy() {
                             <p>
                                 Pour exercer vos droits ou pour toute question relative à la protection de vos données,
                                 contactez-nous à{' '}
-                                <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">support@pomobloom.com</a>.
+                                <a href={`mailto:${support_email}`} className="text-ember hover:underline">{support_email}</a>.
                             </p>
                         </section>
 

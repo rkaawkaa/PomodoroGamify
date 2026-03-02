@@ -74,4 +74,5 @@ export type PageProps<
             user_points: number;
         } | null;
     };
+    support_email: string;
 };

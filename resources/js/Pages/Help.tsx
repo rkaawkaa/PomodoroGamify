@@ -9,7 +9,7 @@ import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import ThemePicker from '@/Components/ThemePicker';
 import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 // ─── Article data ──────────────────────────────────────────────────────────
 
@@ -264,6 +264,7 @@ export default function Help({ auth }: PageProps) {
     const { t, locale } = useTranslation();
     const isFr = locale === 'fr';
     const user = auth?.user ?? null;
+    const { support_email } = usePage<PageProps>().props;
 
     return (
         <>
@@ -379,8 +380,8 @@ export default function Help({ auth }: PageProps) {
                         </p>
                         <p className="mt-1 text-sm text-whisper/55">
                             {isFr ? 'Contacte-nous à ' : 'Reach us at '}
-                            <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">
-                                support@pomobloom.com
+                            <a href={`mailto:${support_email}`} className="text-ember hover:underline">
+                                {support_email}
                             </a>
                         </p>
                     </div>

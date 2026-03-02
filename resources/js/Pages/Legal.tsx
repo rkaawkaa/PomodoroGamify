@@ -3,10 +3,12 @@ import AppLogo from '@/Components/AppLogo';
 import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import ThemePicker from '@/Components/ThemePicker';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Head, Link } from '@inertiajs/react';
+import { PageProps } from '@/types';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 export default function Legal() {
     const { t } = useTranslation();
+    const { support_email } = usePage<PageProps>().props;
 
     return (
         <>
@@ -78,7 +80,7 @@ export default function Legal() {
                             <p>
                                 Pour toute question relative aux présentes mentions légales,
                                 vous pouvez nous contacter à{' '}
-                                <a href="mailto:support@pomobloom.com" className="text-ember hover:underline">support@pomobloom.com</a>.
+                                <a href={`mailto:${support_email}`} className="text-ember hover:underline">{support_email}</a>.
                             </p>
                         </section>
 
