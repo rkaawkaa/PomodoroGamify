@@ -288,7 +288,6 @@ export default function Welcome({ auth }: PageProps) {
     return (
         <>
             <Head>
-                <title>PomoBloom — Free Pomodoro Timer with Gamification</title>
                 <meta name="description" content="Free Pomodoro timer with gamification. Earn points, level up, and track your focus sessions. Build consistent productivity habits — no account required." />
                 <meta name="keywords" content="pomodoro timer, productivity app, gamification, focus timer, time management, pomodoro technique, work sessions, level up, free timer" />
                 <meta property="og:type" content="website" />
