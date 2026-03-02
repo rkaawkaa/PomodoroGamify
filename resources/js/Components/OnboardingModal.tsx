@@ -4,6 +4,7 @@
  * Persists completion via POST /onboarding/complete.
  */
 import { useTranslation } from '@/hooks/useTranslation';
+import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 interface Step {
@@ -81,14 +82,6 @@ const STEPS: Step[] = [
     },
 ];
 
-function getCsrf(): string {
-    const raw = document.cookie
-        .split('; ')
-        .find((r) => r.startsWith('XSRF-TOKEN='))
-        ?.split('=').slice(1).join('=') ?? '';
-    return decodeURIComponent(raw);
-}
-
 interface Props {
     onDismiss: () => void;
 }
@@ -108,17 +101,15 @@ export default function OnboardingModal({ onDismiss }: Props) {
         return () => cancelAnimationFrame(id);
     }, []);
 
-    const handleDismiss = async () => {
+    const handleDismiss = () => {
         if (completing) return;
         setCompleting(true);
         setVisible(false);
-        try {
-            await fetch(route('onboarding.complete'), {
-                method: 'POST',
-                headers: { Accept: 'application/json', 'X-XSRF-TOKEN': getCsrf() },
-            });
-        } catch { /* silent */ }
-        setTimeout(onDismiss, 350);
+        router.post(route('onboarding.complete'), {}, {
+            preserveState: true,
+            preserveScroll: true,
+            onFinish: () => setTimeout(onDismiss, 350),
+        });
     };
 
     const handleNext = () => {

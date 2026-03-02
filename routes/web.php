@@ -105,7 +105,7 @@ Route::middleware('auth')->group(function () {
     // Onboarding
     Route::post('/onboarding/complete', function (Request $request) {
         $request->user()->update(['onboarding_completed' => true]);
-        return response()->noContent();
+        return back();
     })->name('onboarding.complete');
 
     // La Flamme — Victory Wall
