@@ -248,16 +248,6 @@ export default function Welcome({ auth }: PageProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [settings.pomodoro_duration, settings.break_duration]);
 
-    // Tab title
-    useEffect(() => {
-        if (timerState === 'idle') {
-            document.title = `Pomodoro — ${t('app.name')}`;
-        } else if (mode === 'break') {
-            document.title = `${t('timer.short_break')} · ${pad(Math.floor(remaining / 60))}:${pad(remaining % 60)} — ${t('app.name')}`;
-        } else {
-            document.title = `${pad(Math.floor(remaining / 60))}:${pad(remaining % 60)} — ${t('app.name')}`;
-        }
-    }, [remaining, timerState, mode]);
 
     useEffect(() => {
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
@@ -285,9 +275,16 @@ export default function Welcome({ auth }: PageProps) {
     const progress   = phaseTotal > 0 ? remaining / phaseTotal : 1;
     const dashOffset = CIRCUMFERENCE * (1 - progress);
 
+    const tabTitle = timerState === 'idle'
+        ? `Pomodoro — ${t('app.name')}`
+        : mode === 'break'
+            ? `${t('timer.short_break')} · ${pad(minutes)}:${pad(seconds)} — ${t('app.name')}`
+            : `${pad(minutes)}:${pad(seconds)} — ${t('app.name')}`;
+
     return (
         <>
             <Head>
+                <title>{tabTitle}</title>
                 <meta name="description" content="Free Pomodoro timer with gamification. Earn points, level up, and track your focus sessions. Build consistent productivity habits — no account required." />
                 <meta name="keywords" content="pomodoro timer, productivity app, gamification, focus timer, time management, pomodoro technique, work sessions, level up, free timer" />
                 <meta property="og:type" content="website" />
