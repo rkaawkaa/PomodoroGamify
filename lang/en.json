@@ -108,6 +108,7 @@
     "profile.update.submit": "Save changes",
     "profile.update.saved": "Saved.",
     "profile.password.title": "Update password",
+    "profile.password.description": "Secure your account with a long, unique password.",
     "profile.password.current": "Current password",
     "profile.password.new": "New password",
     "profile.password.confirm": "Confirm password",
@@ -249,6 +250,9 @@
     "common.or": "or",
 
     "nav.my_profile": "My profile",
+    "nav.edit_profile": "Edit my profile",
+
+    "profile.page_subtitle": "Manage your account information and security.",
 
     "level.1": "Seed",
     "level.2": "Sprout",

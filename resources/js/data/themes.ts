@@ -124,6 +124,21 @@ export const THEMES: Theme[] = [
             en: ['Tadpole','Mouseling','Kitten','Fox Kit','Wolf Pup','Bear Cub','Jaguar','Lynx','Tiger','Lion','Panther','Cheetah','Grizzly','Elk','Bison','Royal Eagle','Lone Wolf','Alpha','Grand Raptor','Animal Spirit'],
         },
     },
+    {
+        id: 'prestige',
+        icon: '💎',
+        name: { fr: 'Prestige', en: 'Prestige' },
+        colors: {
+            ember:  '43 82% 52%',   // or chaud / deep gold
+            bloom:  '158 46% 46%',  // émeraude
+            coral:  '25 58% 52%',   // cognac / bronze
+            aurora: '46 62% 70%',   // champagne / platine
+        },
+        titles: {
+            fr: ['Aspirant','Analyste','Consultant','Chef de Projet','Manager','Senior Manager','Directeur','Directeur Senior','Vice-Président','SVP','EVP','C-Suite','PDG','Président','Partner Élite','Fondateur','Magnat','Titan','Oligarque','Légende des Affaires'],
+            en: ['Aspirant','Analyst','Consultant','Project Lead','Manager','Senior Manager','Director','Senior Director','Vice President','SVP','EVP','C-Suite','CEO','President','Elite Partner','Founder','Magnate','Titan','Oligarch','Business Legend'],
+        },
+    },
 ];
 
 export const DEFAULT_THEME_ID = 'plant';

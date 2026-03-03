@@ -79,6 +79,18 @@ export default function UserMenu({ onManage }: Props) {
                         </span>
                     </Link>
 
+                    {/* Modifier mon profil */}
+                    <Link
+                        href={route('profile.edit')}
+                        onClick={() => setOpen(false)}
+                        className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-xs font-medium text-whisper transition-colors hover:bg-surface hover:text-moonbeam"
+                    >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                        </svg>
+                        {t('nav.edit_profile')}
+                    </Link>
+
                     <div className="mx-3.5 border-t border-boundary/40" />
 
                     {/* Stats */}
