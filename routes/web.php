@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LocaleController;
@@ -18,6 +19,9 @@ use Inertia\Inertia;
 
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
     return Inertia::render('Welcome');
 })->name('welcome');
 
@@ -130,5 +134,13 @@ Route::get('/privacy', function () {
 })->name('privacy');
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
+
+// ── Admin panel ────────────────────────────────────────────────────────────
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login',  [AdminController::class, 'loginForm'])->name('login');
+    Route::post('/login', [AdminController::class, 'login'])->name('login.post');
+    Route::post('/logout',[AdminController::class, 'logout'])->name('logout');
+    Route::get('/',       [AdminController::class, 'dashboard'])->name('dashboard');
+});
 
 require __DIR__.'/auth.php';
