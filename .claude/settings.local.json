@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add nixpacks.toml .php-version)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
