@@ -119,6 +119,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/victory-messages/{victoryMessage}/like', [MessageLikeController::class, 'toggle'])->name('victory-messages.like');
 });
 
+Route::get('/landing', function () {
+    return Inertia::render('Landing');
+})->name('landing');
+
 Route::get('/social-proof', [SocialProofController::class, 'index'])->name('social-proof');
 
 Route::get('/guide', function () {
