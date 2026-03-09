@@ -191,7 +191,7 @@ export default function Stats({
         <AuthenticatedLayout>
             <Head title={t('stats.page_title')} />
 
-            <div className="mx-auto w-full max-w-xl px-4 pb-16 pt-6">
+            <div className="mx-auto w-full max-w-4xl px-6 pb-16 pt-6">
 
                 {/* ── Back + title ─────────────────────────────────────── */}
                 <div className="mb-4 flex items-center gap-3">
@@ -271,35 +271,50 @@ export default function Stats({
 
                 {/* ══ OVERVIEW ═══════════════════════════════════════════════ */}
                 {tab === 'overview' && (
-                    <div className="space-y-3">
+                    <div className="space-y-6">
 
-                        {/* Stats strip */}
-                        <div className="grid grid-cols-5 divide-x divide-white/8 overflow-hidden rounded-xl border border-white/8 bg-surface/20">
-                            <StatCell label={t('stats.kpi_sessions')}       value={overview.total_sessions.toLocaleString()} accent="text-ember" />
-                            <StatCell label={t('stats.kpi_focus')}          value={fmtHours(overview.total_seconds)}         accent="text-bloom" />
-                            <StatCell label={t('stats.kpi_streak_current')} value={`${overview.current_streak}${t('stats.kpi_day')}`} accent="text-coral" />
-                            <StatCell label={t('stats.kpi_streak_best')}    value={`${overview.best_streak}${t('stats.kpi_day')}`}    accent="text-whisper/50" />
-                            <StatCell label={t('stats.kpi_daily_avg')}      value={String(overview.daily_avg)}               accent="text-aurora" />
+                        {/* KPI Cards */}
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                            <div className="rounded-xl border border-ember/30 bg-ember/10 p-5 text-center">
+                                <div className="text-4xl font-black tabular-nums leading-none text-ember">{overview.total_sessions.toLocaleString()}</div>
+                                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-ember/60">{t('stats.kpi_sessions')}</div>
+                            </div>
+                            <div className="rounded-xl border border-bloom/30 bg-bloom/10 p-5 text-center">
+                                <div className="text-4xl font-black tabular-nums leading-none text-bloom">{fmtHours(overview.total_seconds)}</div>
+                                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-bloom/60">{t('stats.kpi_focus')}</div>
+                            </div>
+                            <div className="rounded-xl border border-coral/30 bg-coral/10 p-5 text-center">
+                                <div className="text-4xl font-black tabular-nums leading-none text-coral">{overview.current_streak}{t('stats.kpi_day')}</div>
+                                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-coral/60">{t('stats.kpi_streak_current')}</div>
+                            </div>
+                            <div className="rounded-xl border border-whisper/20 bg-whisper/5 p-5 text-center">
+                                <div className="text-4xl font-black tabular-nums leading-none text-whisper/70">{overview.best_streak}{t('stats.kpi_day')}</div>
+                                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-whisper/50">{t('stats.kpi_streak_best')}</div>
+                            </div>
+                            <div className="rounded-xl border border-aurora/30 bg-aurora/10 p-5 text-center">
+                                <div className="text-4xl font-black tabular-nums leading-none text-aurora">{String(overview.daily_avg)}</div>
+                                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-aurora/60">{t('stats.kpi_daily_avg')}</div>
+                            </div>
                         </div>
 
                         {/* Charts side by side */}
-                        <div className="grid grid-cols-2 gap-2.5">
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             {/* Daily */}
-                            <div className="rounded-xl border border-white/8 bg-surface/20 p-3">
-                                <div className="mb-1 flex items-center justify-between">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/60">
+                            <div className="rounded-xl border border-ember/20 bg-surface/20 p-5">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-ember/70">
                                         {t('stats.chart_14_days')}
                                     </span>
                                     {!dailyChart.every((d) => d.sessions === 0) && (
-                                        <span className="text-[9px] tabular-nums text-ember/50">
+                                        <span className="text-[10px] tabular-nums text-ember/50">
                                             {Math.max(...dailyChart.map(d => d.sessions))} max
                                         </span>
                                     )}
                                 </div>
                                 {dailyChart.every((d) => d.sessions === 0) ? (
-                                    <p className="py-4 text-center text-[10px] text-whisper/50">{t('stats.no_data')}</p>
+                                    <p className="py-16 text-center text-[11px] text-whisper/50">{t('stats.no_data')}</p>
                                 ) : (
-                                    <div className="h-8">
+                                    <div className="h-44">
                                         <MiniBarChart
                                             data={dailyChart.map((d) => ({
                                                 label: d.label,
@@ -309,28 +324,28 @@ export default function Stats({
                                         />
                                     </div>
                                 )}
-                                <div className="mt-1 flex justify-between text-[8px] text-whisper/50">
+                                <div className="mt-2 flex justify-between text-[9px] text-whisper/55">
                                     <span>{dailyChart[0]?.label}</span>
                                     <span>{dailyChart[dailyChart.length - 1]?.label}</span>
                                 </div>
                             </div>
 
                             {/* Weekly */}
-                            <div className="rounded-xl border border-white/8 bg-surface/20 p-3">
-                                <div className="mb-1 flex items-center justify-between">
-                                    <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-whisper/60">
+                            <div className="rounded-xl border border-bloom/20 bg-surface/20 p-5">
+                                <div className="mb-3 flex items-center justify-between">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-bloom/70">
                                         {t('stats.chart_8_weeks')}
                                     </span>
                                     {!weeklyChart.every((w) => w.sessions === 0) && (
-                                        <span className="text-[9px] tabular-nums text-bloom/50">
+                                        <span className="text-[10px] tabular-nums text-bloom/50">
                                             {Math.max(...weeklyChart.map(w => w.sessions))} max
                                         </span>
                                     )}
                                 </div>
                                 {weeklyChart.every((w) => w.sessions === 0) ? (
-                                    <p className="py-4 text-center text-[10px] text-whisper/50">{t('stats.no_data')}</p>
+                                    <p className="py-16 text-center text-[11px] text-whisper/50">{t('stats.no_data')}</p>
                                 ) : (
-                                    <div className="h-8">
+                                    <div className="h-44">
                                         <MiniBarChart
                                             data={weeklyChart.map((w) => ({
                                                 label: w.label,
@@ -341,7 +356,7 @@ export default function Stats({
                                         />
                                     </div>
                                 )}
-                                <div className="mt-1 flex justify-between text-[8px] text-whisper/50">
+                                <div className="mt-2 flex justify-between text-[9px] text-whisper/55">
                                     <span>{weeklyChart[0]?.label}</span>
                                     <span>{weeklyChart[weeklyChart.length - 1]?.label}</span>
                                 </div>

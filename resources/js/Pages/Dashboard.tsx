@@ -120,7 +120,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
 
     // Modals
     const [settingsOpen, setSettingsOpen] = useState(false);
-    const [manageOpen, setManageOpen] = useState(false);
+    const [manageOpen, setManageOpen] = useState(() => new URLSearchParams(window.location.search).get('manage') === '1');
     const [goalsOpen, setGoalsOpen] = useState(false);
     const [victoryWallOpen, setVictoryWallOpen] = useState(false);
     const [pendingVictoryMessage, setPendingVictoryMessage] = useState<VictoryMessage | null>(null);

@@ -56,7 +56,7 @@ export default function AppFooter() {
                 <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
 
                     {/* Left: copyright */}
-                    <p className="text-[11px] text-whisper/75">
+                    <p className="text-[11px] text-whisper/90">
                         © {year} {t('app.name')} — {t('app.tagline')}
                     </p>
 
@@ -69,7 +69,7 @@ export default function AppFooter() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 title={label}
-                                className="text-whisper/60 transition-colors hover:text-moonbeam"
+                                className="text-whisper/80 transition-colors hover:text-moonbeam"
                             >
                                 {icon}
                             </a>
@@ -78,27 +78,27 @@ export default function AppFooter() {
 
                     {/* Right: legal links */}
                     <nav className="flex items-center gap-4">
-                        <Link href={route('legal')} className="text-[11px] text-whisper/75 transition-colors hover:text-moonbeam">
+                        <Link href={route('legal')} className="text-[11px] text-whisper/90 transition-colors hover:text-moonbeam">
                             {t('footer.legal')}
                         </Link>
                         <span className="select-none text-whisper/30">·</span>
-                        <Link href={route('privacy')} className="text-[11px] text-whisper/75 transition-colors hover:text-moonbeam">
+                        <Link href={route('privacy')} className="text-[11px] text-whisper/90 transition-colors hover:text-moonbeam">
                             {t('footer.privacy')}
                         </Link>
                         <span className="select-none text-whisper/30">·</span>
-                        <Link href={route('help')} className="text-[11px] text-whisper/75 transition-colors hover:text-moonbeam">
+                        <Link href={route('help')} className="text-[11px] text-whisper/90 transition-colors hover:text-moonbeam">
                             {t('footer.help')}
                         </Link>
                         <span className="select-none text-whisper/30">·</span>
-                        <a href={`mailto:${support_email}`} className="text-[11px] text-whisper/75 transition-colors hover:text-moonbeam">
+                        <a href={`mailto:${support_email}`} className="text-[11px] text-whisper/90 transition-colors hover:text-moonbeam">
                             {t('footer.contact')}
                         </a>
                     </nav>
                 </div>
 
                 {/* Bottom row: credits */}
-                <p className="text-center text-[11px] text-whisper/50">
-                    Développé avec ❤️ par <span className="font-semibold text-whisper/70">KAWKA Robin</span>
+                <p className="text-center text-[11px] text-whisper/80">
+                    Développé avec ❤️ par <span className="font-semibold text-moonbeam/80">Robin</span>
                 </p>
 
             </div>

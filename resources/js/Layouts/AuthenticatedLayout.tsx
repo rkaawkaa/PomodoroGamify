@@ -4,7 +4,7 @@ import LocaleSwitcher from '@/Components/LocaleSwitcher';
 import ThemePicker from '@/Components/ThemePicker';
 import UserMenu from '@/Components/UserMenu';
 import { useTranslation } from '@/hooks/useTranslation';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
 
 interface Props extends PropsWithChildren {
@@ -47,7 +47,7 @@ export default function AuthenticatedLayout({ children, onManage }: Props) {
                         <span className="select-none text-boundary">|</span>
                         <ThemePicker />
                         <span className="select-none text-boundary">|</span>
-                        <UserMenu onManage={onManage ?? (() => {})} />
+                        <UserMenu onManage={onManage ?? (() => router.get(route('dashboard'), { manage: '1' }))} />
                     </div>
 
                     {/* Mobile hamburger */}
@@ -93,7 +93,7 @@ export default function AuthenticatedLayout({ children, onManage }: Props) {
                                 {t('nav.help')}
                             </Link>
                             <div className="h-px bg-boundary/30" />
-                            <UserMenu onManage={onManage ?? (() => {})} />
+                            <UserMenu onManage={onManage ?? (() => router.get(route('dashboard'), { manage: '1' }))} />
                         </div>
                     </div>
                 )}
