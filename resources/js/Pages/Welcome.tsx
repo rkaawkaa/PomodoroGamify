@@ -30,7 +30,7 @@ const DEFAULT_SETTINGS: PomodoroSettings = {
 type TimerMode = "focus" | "break";
 type TimerState = "idle" | "running" | "paused";
 
-// ─── Audio (Web Audio API, no asset files) t ─────────────────────────────────
+// ─── Audio (Web Audio API, no asset files) ─────────────────────────────────
 function playSound(type: "focus" | "break") {
     try {
         const ctx = new AudioContext();
