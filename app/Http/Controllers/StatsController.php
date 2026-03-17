@@ -48,8 +48,7 @@ class StatsController extends Controller
 
         // ── History (paginated, filtered) ───────────────────────────────────
         $history = $makeQuery()
-            ->with(['project:id,name', 'categories:id,name'])
-            ->withCount('tasks')
+            ->with(['project:id,name', 'categories:id,name', 'tasks:id,title,session_id,status'])
             ->orderBy('ended_at', 'desc')
             ->paginate(15, ['*'], 'history_page')
             ->through(fn ($s) => [
@@ -58,7 +57,7 @@ class StatsController extends Controller
                 'duration_seconds' => $s->duration_seconds,
                 'project'          => $s->project ? ['id' => $s->project->id, 'name' => $s->project->name] : null,
                 'categories'       => $s->categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values(),
-                'tasks_count'      => $s->tasks_count,
+                'tasks'            => $s->tasks->map(fn ($t) => ['id' => $t->id, 'title' => $t->title, 'done' => $t->status === 'done'])->values(),
             ]);
 
         // ── Leaderboard (global, not filtered) ──────────────────────────────

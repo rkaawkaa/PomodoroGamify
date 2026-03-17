@@ -283,7 +283,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
             )}
 
             {/* ── Task list ──────────────────────────────────────────────── */}
-            <div className="max-h-36 space-y-0.5 overflow-y-auto">
+            <div className="max-h-52 space-y-0.5 overflow-y-auto">
 
                 {/* Pending tasks (draggable) */}
                 {pending.map((task) => (
@@ -464,7 +464,7 @@ function TaskRow({
                 <span
                     onDoubleClick={!isDone ? onStartEdit : undefined}
                     title={!isDone ? 'Double-clic pour renommer' : undefined}
-                    className={`flex-1 select-none truncate text-[12px] transition-all duration-300 ${
+                    className={`flex-1 select-none break-words leading-snug text-[12px] transition-all duration-300 ${
                         isDone
                             ? 'text-whisper/45 line-through'
                             : isActive
