@@ -1,14 +1,20 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { DEFAULT_THEME_ID, getTheme, Theme } from '@/data/themes';
 
+export type ColorMode = 'dark' | 'light';
+
 interface ThemeContextType {
     theme: Theme;
     setThemeId: (id: string) => void;
+    colorMode: ColorMode;
+    toggleColorMode: () => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
     theme: getTheme(DEFAULT_THEME_ID),
     setThemeId: () => {},
+    colorMode: 'dark',
+    toggleColorMode: () => {},
 });
 
 function readStoredThemeId(): string {
@@ -16,6 +22,15 @@ function readStoredThemeId(): string {
         return localStorage.getItem('pomobloom_theme') ?? DEFAULT_THEME_ID;
     } catch {
         return DEFAULT_THEME_ID;
+    }
+}
+
+function readStoredColorMode(): ColorMode {
+    try {
+        const stored = localStorage.getItem('pomobloom_color_mode');
+        return stored === 'light' ? 'light' : 'dark';
+    } catch {
+        return 'dark';
     }
 }
 
@@ -34,22 +49,38 @@ function injectCssVars(theme: Theme) {
 }`;
 }
 
+function applyColorMode(mode: ColorMode) {
+    document.documentElement.setAttribute('data-color-mode', mode);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [themeId, setThemeIdState] = useState<string>(readStoredThemeId);
+    const [themeId, setThemeIdState]     = useState<string>(readStoredThemeId);
+    const [colorMode, setColorModeState] = useState<ColorMode>(readStoredColorMode);
     const theme = getTheme(themeId);
 
-    // Inject CSS variables whenever theme changes
     useEffect(() => {
         injectCssVars(theme);
     }, [theme]);
+
+    useEffect(() => {
+        applyColorMode(colorMode);
+    }, [colorMode]);
 
     const setThemeId = (id: string) => {
         try { localStorage.setItem('pomobloom_theme', id); } catch { /* silent */ }
         setThemeIdState(id);
     };
 
+    const toggleColorMode = () => {
+        setColorModeState((prev) => {
+            const next: ColorMode = prev === 'dark' ? 'light' : 'dark';
+            try { localStorage.setItem('pomobloom_color_mode', next); } catch { /* silent */ }
+            return next;
+        });
+    };
+
     return (
-        <ThemeContext.Provider value={{ theme, setThemeId }}>
+        <ThemeContext.Provider value={{ theme, setThemeId, colorMode, toggleColorMode }}>
             {children}
         </ThemeContext.Provider>
     );

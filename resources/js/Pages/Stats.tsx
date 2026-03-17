@@ -5,7 +5,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -66,53 +66,181 @@ function fmtTime(iso: string): string {
     return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
+// ─── FilterSelect ────────────────────────────────────────────────────────────
+
+function FilterSelect({
+    value,
+    onChange,
+    options,
+    placeholder,
+    accentColor = 'ember',
+}: {
+    value: string;
+    onChange: (v: string) => void;
+    options: Array<{ value: string; label: string }>;
+    placeholder: string;
+    accentColor?: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const selected = options.find((o) => o.value === value);
+
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const activeClass =
+        accentColor === 'aurora'
+            ? 'border-aurora/40 bg-aurora/12 text-aurora'
+            : 'border-ember/40 bg-ember/12 text-ember';
+
+    const dotClass =
+        accentColor === 'aurora'
+            ? 'bg-aurora'
+            : 'bg-ember';
+
+    return (
+        <div ref={ref} className="relative">
+            <button
+                type="button"
+                onClick={() => setOpen((v) => !v)}
+                className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-[11px] font-medium transition-all ${
+                    selected
+                        ? activeClass
+                        : 'border-white/10 bg-depth/70 text-whisper/70 hover:border-white/20 hover:text-moonbeam'
+                }`}
+            >
+                {selected && <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} />}
+                <span className="max-w-[120px] truncate">{selected?.label ?? placeholder}</span>
+                {selected ? (
+                    <span
+                        onClick={(e) => { e.stopPropagation(); onChange(''); setOpen(false); }}
+                        className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full opacity-60 transition-opacity hover:opacity-100"
+                    >
+                        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                            <line x1="1" y1="1" x2="9" y2="9"/><line x1="9" y1="1" x2="1" y2="9"/>
+                        </svg>
+                    </span>
+                ) : (
+                    <svg
+                        className={`h-3 w-3 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                        viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                    >
+                        <path d="M2 3.5l3 3 3-3"/>
+                    </svg>
+                )}
+            </button>
+
+            {open && (
+                <div className="absolute left-0 top-full z-50 mt-1.5 min-w-[160px] overflow-hidden rounded-2xl border border-boundary/60 bg-depth shadow-2xl shadow-black/30">
+                    <div className="max-h-56 overflow-y-auto p-1.5">
+                        {options.map((o) => (
+                            <button
+                                key={o.value}
+                                type="button"
+                                onClick={() => { onChange(o.value); setOpen(false); }}
+                                className={`flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-[11px] font-medium transition-colors ${
+                                    value === o.value
+                                        ? (accentColor === 'aurora' ? 'bg-aurora/15 text-aurora' : 'bg-ember/15 text-ember')
+                                        : 'text-moonbeam/80 hover:bg-surface/60'
+                                }`}
+                            >
+                                {value === o.value && <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} />}
+                                {value !== o.value && <span className="h-1.5 w-1.5 shrink-0" />}
+                                {o.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ─── BarChart ────────────────────────────────────────────────────────────────
 
 function BarChart({
     data,
     color = 'var(--color-ember)',
     highlightColor,
+    gradId = 'a',
 }: {
     data: Array<{ label: string; sessions: number; highlighted?: boolean }>;
     color?: string;
     highlightColor?: string;
+    gradId?: string;
 }) {
     const max = Math.max(...data.map((d) => d.sessions), 1);
     const n   = data.length;
-    const H   = 80;
+    const H   = 90;
     const G   = 1.5;
     const bw  = (100 - G * (n + 1)) / n;
     const hc  = highlightColor ?? color;
+    const mainId = `grad-main-${gradId}`;
+    const hlId   = `grad-hl-${gradId}`;
+    const glowId = `glow-${gradId}`;
 
     return (
         <svg viewBox={`0 0 100 ${H}`} className="h-full w-full" preserveAspectRatio="none">
             <defs>
-                <linearGradient id="bar-grad-main" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={color} stopOpacity="0.85" />
-                    <stop offset="100%" stopColor={color} stopOpacity="0.25" />
+                <linearGradient id={mainId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity="0.7" />
+                    <stop offset="100%" stopColor={color} stopOpacity="0.15" />
                 </linearGradient>
-                <linearGradient id="bar-grad-hl" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id={hlId} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor={hc} stopOpacity="1" />
-                    <stop offset="100%" stopColor={hc} stopOpacity="0.5" />
+                    <stop offset="100%" stopColor={hc} stopOpacity="0.45" />
                 </linearGradient>
+                <filter id={glowId} x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="1.5" result="blur" />
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
             </defs>
-            {/* Subtle grid lines */}
-            {[0.25, 0.5, 0.75].map((f, i) => (
-                <line key={i} x1="0" y1={H * f} x2="100" y2={H * f} stroke="white" strokeOpacity="0.04" strokeWidth="0.5" />
+
+            {/* Grid lines */}
+            {[0.33, 0.66].map((f, i) => (
+                <line key={i} x1="0" y1={H * f} x2="100" y2={H * f}
+                    stroke="white" strokeOpacity="0.05" strokeWidth="0.5" strokeDasharray="2 2" />
             ))}
+
             {data.map((d, i) => {
                 const x  = G + i * (bw + G);
-                const bh = Math.max(2, (d.sessions / max) * (H - 4));
+                const bh = Math.max(2.5, (d.sessions / max) * (H - 10));
                 const y  = H - bh;
                 const hl = d.highlighted ?? false;
+                const showLabel = d.sessions > 0 && bh > 15;
+
                 return (
                     <g key={i}>
                         <title>{`${d.label}: ${d.sessions}`}</title>
-                        <rect
-                            x={x} y={y} width={bw} height={bh}
-                            rx={Math.min(1.8, bw / 4)}
-                            fill={hl ? 'url(#bar-grad-hl)' : 'url(#bar-grad-main)'}
+                        {/* Glow for highlighted */}
+                        {hl && (
+                            <rect x={x} y={y} width={bw} height={bh}
+                                rx={Math.min(2, bw / 4)}
+                                fill={hc} fillOpacity="0.25"
+                                filter={`url(#${glowId})`}
+                            />
+                        )}
+                        <rect x={x} y={y} width={bw} height={bh}
+                            rx={Math.min(2, bw / 4)}
+                            fill={hl ? `url(#${hlId})` : `url(#${mainId})`}
                         />
+                        {/* Value label on top of bar */}
+                        {showLabel && (
+                            <text
+                                x={x + bw / 2} y={y - 2}
+                                textAnchor="middle"
+                                fontSize="4.5"
+                                fill={hl ? hc : color}
+                                fillOpacity={hl ? 1 : 0.7}
+                            >
+                                {d.sessions}
+                            </text>
+                        )}
                     </g>
                 );
             })}
@@ -123,22 +251,37 @@ function BarChart({
 // ─── KpiCard ─────────────────────────────────────────────────────────────────
 
 function KpiCard({
-    value, label, color, bgColor, borderColor, icon,
+    value, label, colorClass, fromClass, toClass, borderClass, glowStyle, icon,
 }: {
     value: string;
     label: string;
-    color: string;
-    bgColor: string;
-    borderColor: string;
+    colorClass: string;
+    fromClass: string;
+    toClass: string;
+    borderClass: string;
+    glowStyle: React.CSSProperties;
     icon: React.ReactNode;
 }) {
     return (
-        <div className={`relative overflow-hidden rounded-2xl border p-5 ${bgColor} ${borderColor}`}>
-            <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-xl ${bgColor} ${color} opacity-80`}>
-                {icon}
+        <div
+            className={`relative overflow-hidden rounded-2xl border p-5 ${borderClass}`}
+            style={{
+                background: `linear-gradient(135deg, var(--from-color, transparent) 0%, transparent 100%)`,
+                ...glowStyle,
+            }}
+        >
+            {/* Gradient background overlay */}
+            <div className={`absolute inset-0 ${fromClass} ${toClass} opacity-100`} style={{ background: 'inherit' }} />
+            <div className={`absolute inset-0 rounded-2xl ${fromClass}`} style={{ opacity: 0 }} />
+
+            {/* Actual content (above gradient) */}
+            <div className="relative">
+                <div className={`mb-3 flex h-8 w-8 items-center justify-center rounded-xl ${colorClass} opacity-75`}>
+                    {icon}
+                </div>
+                <div className={`text-3xl font-black tabular-nums leading-none ${colorClass}`}>{value}</div>
+                <div className={`mt-1.5 text-[10px] font-bold uppercase tracking-widest ${colorClass} opacity-60`}>{label}</div>
             </div>
-            <div className={`text-3xl font-black tabular-nums leading-none ${color}`}>{value}</div>
-            <div className={`mt-1.5 text-[10px] font-semibold uppercase tracking-widest ${color} opacity-60`}>{label}</div>
         </div>
     );
 }
@@ -158,18 +301,15 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
                     ? 'border border-white/6 bg-white/3'
                     : 'border border-transparent hover:bg-white/3'
         }`}>
-            {/* Rank */}
             <div className="w-7 shrink-0 text-center">
                 {medal
                     ? <span className="text-base leading-none">{medal}</span>
                     : <span className="text-[11px] font-bold text-whisper/45">#{rank}</span>
                 }
             </div>
-            {/* Avatar */}
             <div className={`flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border ${level.borderColor} ${level.bgColor}`}>
                 <PlantAvatar level={level.level} size={24} />
             </div>
-            {/* Name */}
             <div className="min-w-0 flex-1">
                 <div className={`truncate text-[12px] font-semibold ${isCurrentUser ? 'text-ember' : 'text-moonbeam/85'}`}>
                     {entry.name}
@@ -177,7 +317,6 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
                 </div>
                 <div className={`text-[10px] ${level.color} opacity-70`}>Niv. {level.level}</div>
             </div>
-            {/* Sessions */}
             <div className="shrink-0 text-right">
                 <span className="text-sm font-black tabular-nums text-moonbeam/80">{entry.sessions}</span>
                 <span className="ml-0.5 text-[9px] text-whisper/50">sess.</span>
@@ -185,6 +324,66 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
         </div>
     );
 }
+
+// ─── KPI config ──────────────────────────────────────────────────────────────
+
+const KPI_CONFIGS = [
+    {
+        colorClass: 'text-ember',
+        border: 'border-ember/25',
+        bg: 'bg-ember/12',
+        shadow: { boxShadow: '0 4px 32px -6px hsl(var(--ember) / 0.25)' } as React.CSSProperties,
+        icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+        ),
+    },
+    {
+        colorClass: 'text-bloom',
+        border: 'border-bloom/25',
+        bg: 'bg-bloom/12',
+        shadow: { boxShadow: '0 4px 32px -6px hsl(var(--bloom) / 0.25)' } as React.CSSProperties,
+        icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+        ),
+    },
+    {
+        colorClass: 'text-coral',
+        border: 'border-coral/25',
+        bg: 'bg-coral/12',
+        shadow: { boxShadow: '0 4px 32px -6px hsl(var(--coral) / 0.25)' } as React.CSSProperties,
+        icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+        ),
+    },
+    {
+        colorClass: 'text-sunbeam',
+        border: 'border-sunbeam/25',
+        bg: 'bg-sunbeam/10',
+        shadow: { boxShadow: '0 4px 32px -6px hsl(var(--sunbeam) / 0.2)' } as React.CSSProperties,
+        icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+        ),
+    },
+    {
+        colorClass: 'text-aurora',
+        border: 'border-aurora/25',
+        bg: 'bg-aurora/12',
+        shadow: { boxShadow: '0 4px 32px -6px hsl(var(--aurora) / 0.25)' } as React.CSSProperties,
+        icon: (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+        ),
+    },
+];
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
@@ -209,10 +408,10 @@ export default function Stats({
         { key: 'month', label: t('stats.filter_period_month') },
     ] as const;
 
-    const lbEntries  = leaderboard[lbPeriod];
-    const myLbIndex  = lbEntries.findIndex((e) => e.id === userId);
-    const myRank     = myLbIndex >= 0 ? myLbIndex + 1 : 0;
-    const encourage  =
+    const lbEntries = leaderboard[lbPeriod];
+    const myLbIndex = lbEntries.findIndex((e) => e.id === userId);
+    const myRank    = myLbIndex >= 0 ? myLbIndex + 1 : 0;
+    const encourage =
         lbEntries.length === 0 ? t('stats.lb_empty') :
         myRank === 0  ? t('stats.lb_not_ranked') :
         myRank === 1  ? t('stats.lb_encourage_1') :
@@ -225,6 +424,24 @@ export default function Stats({
         history:     t('stats.tab_history'),
         leaderboard: t('stats.tab_leaderboard'),
     };
+
+    const kpiValues = [
+        overview.total_sessions.toLocaleString(),
+        fmtHours(overview.total_seconds),
+        `${overview.current_streak}${t('stats.kpi_day')}`,
+        `${overview.best_streak}${t('stats.kpi_day')}`,
+        String(overview.daily_avg),
+    ];
+    const kpiLabels = [
+        t('stats.kpi_sessions'),
+        t('stats.kpi_focus'),
+        t('stats.kpi_streak_current'),
+        t('stats.kpi_streak_best'),
+        t('stats.kpi_daily_avg'),
+    ];
+
+    const projectOptions  = projects.map((p) => ({ value: String(p.id), label: p.name }));
+    const categoryOptions = categories.map((c) => ({ value: String(c.id), label: c.name }));
 
     return (
         <AuthenticatedLayout>
@@ -251,7 +468,8 @@ export default function Stats({
 
                 {/* ── Filter bar ─────────────────────────────────────────── */}
                 <div className="mb-5 flex flex-wrap items-center gap-2">
-                    <div className="flex rounded-xl border border-white/8 bg-depth/60 p-1">
+                    {/* Period pills */}
+                    <div className="flex rounded-xl border border-white/10 bg-depth/60 p-1">
                         {PERIODS.map((p) => (
                             <button
                                 key={p.key}
@@ -259,7 +477,7 @@ export default function Stats({
                                 onClick={() => applyFilter({ period: p.key, history_page: 1 })}
                                 className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all ${
                                     filters.period === p.key
-                                        ? 'bg-ember/85 text-white shadow-sm'
+                                        ? 'bg-ember/80 text-white shadow-sm'
                                         : 'text-whisper/60 hover:text-moonbeam'
                                 }`}
                             >
@@ -268,22 +486,23 @@ export default function Stats({
                         ))}
                     </div>
 
-                    <select
-                        value={filters.project ?? ''}
-                        onChange={(e) => applyFilter({ project: e.target.value ? Number(e.target.value) : null, history_page: 1 })}
-                        className="rounded-xl border border-white/8 bg-depth/60 px-3 py-2 text-[11px] text-whisper/65 focus:outline-none"
-                    >
-                        <option value="">{t('stats.filter_project')}</option>
-                        {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                    </select>
-                    <select
-                        value={filters.category ?? ''}
-                        onChange={(e) => applyFilter({ category: e.target.value ? Number(e.target.value) : null, history_page: 1 })}
-                        className="rounded-xl border border-white/8 bg-depth/60 px-3 py-2 text-[11px] text-whisper/65 focus:outline-none"
-                    >
-                        <option value="">{t('stats.filter_category')}</option>
-                        {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
+                    {/* Custom project select */}
+                    <FilterSelect
+                        value={filters.project ? String(filters.project) : ''}
+                        onChange={(v) => applyFilter({ project: v ? Number(v) : null, history_page: 1 })}
+                        options={projectOptions}
+                        placeholder={t('stats.filter_project')}
+                        accentColor="aurora"
+                    />
+
+                    {/* Custom category select */}
+                    <FilterSelect
+                        value={filters.category ? String(filters.category) : ''}
+                        onChange={(v) => applyFilter({ category: v ? Number(v) : null, history_page: 1 })}
+                        options={categoryOptions}
+                        placeholder={t('stats.filter_category')}
+                        accentColor="ember"
+                    />
                 </div>
 
                 {/* ── Tabs ───────────────────────────────────────────────── */}
@@ -308,58 +527,32 @@ export default function Stats({
                 {tab === 'overview' && (
                     <div className="space-y-5">
 
-                        {/* KPI Cards — 2×3 grid on mobile, 5 cols on sm */}
+                        {/* KPI Cards */}
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                            <KpiCard
-                                value={overview.total_sessions.toLocaleString()}
-                                label={t('stats.kpi_sessions')}
-                                color="text-ember"
-                                bgColor="bg-ember/10"
-                                borderColor="border-ember/20"
-                                icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>}
-                            />
-                            <KpiCard
-                                value={fmtHours(overview.total_seconds)}
-                                label={t('stats.kpi_focus')}
-                                color="text-bloom"
-                                bgColor="bg-bloom/10"
-                                borderColor="border-bloom/20"
-                                icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>}
-                            />
-                            <KpiCard
-                                value={`${overview.current_streak}${t('stats.kpi_day')}`}
-                                label={t('stats.kpi_streak_current')}
-                                color="text-coral"
-                                bgColor="bg-coral/10"
-                                borderColor="border-coral/20"
-                                icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>}
-                            />
-                            <KpiCard
-                                value={`${overview.best_streak}${t('stats.kpi_day')}`}
-                                label={t('stats.kpi_streak_best')}
-                                color="text-whisper"
-                                bgColor="bg-white/5"
-                                borderColor="border-white/8"
-                                icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>}
-                            />
-                            <KpiCard
-                                value={String(overview.daily_avg)}
-                                label={t('stats.kpi_daily_avg')}
-                                color="text-aurora"
-                                bgColor="bg-aurora/10"
-                                borderColor="border-aurora/20"
-                                icon={<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>}
-                            />
+                            {kpiValues.map((val, i) => {
+                                const cfg = KPI_CONFIGS[i];
+                                return (
+                                    <div
+                                        key={i}
+                                        className={`relative overflow-hidden rounded-2xl border p-5 ${cfg.border} ${cfg.bg}`}
+                                        style={cfg.shadow}
+                                    >
+                                        <div className={`mb-3 ${cfg.colorClass} opacity-70`}>{cfg.icon}</div>
+                                        <div className={`text-3xl font-black tabular-nums leading-none ${cfg.colorClass}`}>{val}</div>
+                                        <div className={`mt-1.5 text-[10px] font-bold uppercase tracking-widest ${cfg.colorClass} opacity-55`}>{kpiLabels[i]}</div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Charts */}
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             {/* Daily */}
-                            <div className="rounded-2xl border border-white/8 bg-depth/50 p-5">
+                            <div className="rounded-2xl border border-ember/15 bg-depth/60 p-5" style={{ boxShadow: '0 2px 20px -4px hsl(var(--ember) / 0.12)' }}>
                                 <div className="mb-1 flex items-center justify-between">
                                     <span className="text-[11px] font-bold text-ember/80">{t('stats.chart_14_days')}</span>
                                     {!dailyChart.every((d) => d.sessions === 0) && (
-                                        <span className="rounded-full bg-ember/10 px-2 py-0.5 text-[10px] tabular-nums text-ember/60">
+                                        <span className="rounded-full bg-ember/15 px-2 py-0.5 text-[10px] tabular-nums text-ember/70">
                                             {Math.max(...dailyChart.map(d => d.sessions))} max
                                         </span>
                                     )}
@@ -370,21 +563,22 @@ export default function Stats({
                                     <div className="h-40">
                                         <BarChart
                                             data={dailyChart.map((d) => ({ label: d.label, sessions: d.sessions, highlighted: d.today }))}
+                                            gradId="daily"
                                         />
                                     </div>
                                 )}
-                                <div className="mt-2 flex justify-between text-[9px] text-whisper/45">
+                                <div className="mt-2 flex justify-between text-[9px] text-whisper/40">
                                     <span>{dailyChart[0]?.label}</span>
                                     <span>{dailyChart[dailyChart.length - 1]?.label}</span>
                                 </div>
                             </div>
 
                             {/* Weekly */}
-                            <div className="rounded-2xl border border-white/8 bg-depth/50 p-5">
+                            <div className="rounded-2xl border border-bloom/15 bg-depth/60 p-5" style={{ boxShadow: '0 2px 20px -4px hsl(var(--bloom) / 0.12)' }}>
                                 <div className="mb-1 flex items-center justify-between">
                                     <span className="text-[11px] font-bold text-bloom/80">{t('stats.chart_8_weeks')}</span>
                                     {!weeklyChart.every((w) => w.sessions === 0) && (
-                                        <span className="rounded-full bg-bloom/10 px-2 py-0.5 text-[10px] tabular-nums text-bloom/60">
+                                        <span className="rounded-full bg-bloom/15 px-2 py-0.5 text-[10px] tabular-nums text-bloom/70">
                                             {Math.max(...weeklyChart.map(w => w.sessions))} max
                                         </span>
                                     )}
@@ -396,10 +590,11 @@ export default function Stats({
                                         <BarChart
                                             data={weeklyChart.map((w) => ({ label: w.label, sessions: w.sessions, highlighted: w.current }))}
                                             color="var(--color-bloom)"
+                                            gradId="weekly"
                                         />
                                     </div>
                                 )}
-                                <div className="mt-2 flex justify-between text-[9px] text-whisper/45">
+                                <div className="mt-2 flex justify-between text-[9px] text-whisper/40">
                                     <span>{weeklyChart[0]?.label}</span>
                                     <span>{weeklyChart[weeklyChart.length - 1]?.label}</span>
                                 </div>
@@ -445,7 +640,6 @@ export default function Stats({
                 {/* ══ LEADERBOARD ════════════════════════════════════════════ */}
                 {tab === 'leaderboard' && (
                     <div className="space-y-4">
-                        {/* Period toggle + rank bubble */}
                         <div className="flex items-center justify-between gap-3">
                             <div className="flex rounded-xl border border-white/8 bg-depth/50 p-1">
                                 {(['weekly', 'monthly'] as LbPeriod[]).map((p) => (
@@ -468,24 +662,17 @@ export default function Stats({
                             )}
                         </div>
 
-                        {/* Encouragement banner */}
                         <div className="rounded-xl border border-bloom/15 bg-bloom/8 px-4 py-3 text-[12px] text-bloom/75">
                             {encourage}
                         </div>
 
-                        {/* Rankings */}
                         <div className="rounded-2xl border border-white/8 bg-depth/40 p-2">
                             {lbEntries.length === 0 ? (
                                 <p className="py-10 text-center text-sm text-whisper/50">{t('stats.lb_empty')}</p>
                             ) : (
                                 <div className="space-y-1">
                                     {lbEntries.slice(0, 10).map((entry, i) => (
-                                        <LeaderRow
-                                            key={entry.id}
-                                            rank={i + 1}
-                                            entry={entry}
-                                            isCurrentUser={entry.id === userId}
-                                        />
+                                        <LeaderRow key={entry.id} rank={i + 1} entry={entry} isCurrentUser={entry.id === userId} />
                                     ))}
                                     {myRank > 10 && myLbIndex >= 0 && (
                                         <>
@@ -518,12 +705,11 @@ export default function Stats({
 // ─── HistoryRow ───────────────────────────────────────────────────────────────
 
 function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) => string }) {
-    const doneTasks    = session.tasks.filter((t) => t.done);
-    const pendingTasks = session.tasks.filter((t) => !t.done);
+    const doneTasks    = session.tasks.filter((task) => task.done);
+    const pendingTasks = session.tasks.filter((task) => !task.done);
 
     return (
         <div className="rounded-2xl border border-white/8 bg-depth/50 p-4 transition-colors hover:bg-depth/80">
-            {/* Top row: date + duration */}
             <div className="mb-3 flex items-start justify-between gap-3">
                 <div>
                     <div className="text-[12px] font-semibold text-moonbeam/90">{fmtDate(session.ended_at)}</div>
@@ -534,7 +720,6 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
                 </span>
             </div>
 
-            {/* Tags */}
             <div className="flex flex-wrap gap-1.5">
                 <span className="inline-flex items-center rounded-full border border-aurora/20 bg-aurora/8 px-2 py-0.5 text-[10px] font-medium text-aurora/80">
                     {session.project?.name ?? t('stats.history_no_project')}
@@ -546,7 +731,6 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
                 ))}
             </div>
 
-            {/* Tasks */}
             {session.tasks.length > 0 && (
                 <div className="mt-3 space-y-1 border-t border-white/5 pt-3">
                     {doneTasks.map((task) => (
