@@ -29,4 +29,3 @@ Schedule::command('recap:send yearly')
     ->runInBackground();
 
 
-Schedule::command('inspire')->everyMinute();
