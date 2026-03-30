@@ -13,24 +13,26 @@ class StatsController extends Controller
     public function index(Request $request)
     {
         $user      = $request->user();
-        $projectId = $request->integer('project') ?: null;
+        $projectId  = $request->integer('project') ?: null;
         $categoryId = $request->integer('category') ?: null;
-        $period    = in_array($request->string('period')->toString(), ['today', 'week', 'month', 'all'])
-                     ? $request->string('period')->toString()
-                     : 'all';
-        $histPage  = max(1, (int) $request->query('history_page', 1));
+        $period     = in_array($request->string('period')->toString(), ['today', 'week', 'month', 'all'])
+                      ? $request->string('period')->toString()
+                      : 'all';
+        $source     = in_array($request->string('source')->toString(), ['all', 'real', 'declared'])
+                      ? $request->string('source')->toString()
+                      : 'all';
+        $histPage   = max(1, (int) $request->query('history_page', 1));
 
         // ── Filtered query factory ──────────────────────────────────────────
         $makeQuery = fn () => $user->pomodoroSessions()
             ->whereNotNull('ended_at')
-            ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
-            ->when(
-                $categoryId,
-                fn ($q) => $q->whereHas('categories', fn ($q2) => $q2->where('categories.id', $categoryId))
-            )
+            ->when($projectId,  fn ($q) => $q->where('project_id', $projectId))
+            ->when($categoryId, fn ($q) => $q->whereHas('categories', fn ($q2) => $q2->where('categories.id', $categoryId)))
             ->when($period === 'today', fn ($q) => $q->whereDate('ended_at', today()))
-            ->when($period === 'week', fn ($q) => $q->whereBetween('ended_at', [now()->startOfWeek(), now()->endOfWeek()]))
-            ->when($period === 'month', fn ($q) => $q->where('ended_at', '>=', now()->startOfMonth()));
+            ->when($period === 'week',  fn ($q) => $q->whereBetween('ended_at', [now()->startOfWeek(), now()->endOfWeek()]))
+            ->when($period === 'month', fn ($q) => $q->where('ended_at', '>=', now()->startOfMonth()))
+            ->when($source === 'real',     fn ($q) => $q->where('is_declared', false))
+            ->when($source === 'declared', fn ($q) => $q->where('is_declared', true));
 
         // ── Overview KPIs ───────────────────────────────────────────────────
         $totalSessions = $makeQuery()->count();
@@ -55,6 +57,7 @@ class StatsController extends Controller
                 'id'               => $s->id,
                 'ended_at'         => $s->ended_at->toIso8601String(),
                 'duration_seconds' => $s->duration_seconds,
+                'is_declared'      => (bool) $s->is_declared,
                 'project'          => $s->project ? ['id' => $s->project->id, 'name' => $s->project->name] : null,
                 'categories'       => $s->categories->map(fn ($c) => ['id' => $c->id, 'name' => $c->name])->values(),
                 'tasks'            => $s->tasks->map(fn ($t) => ['id' => $t->id, 'title' => $t->title, 'done' => $t->status === 'done'])->values(),
@@ -64,7 +67,7 @@ class StatsController extends Controller
         $leaderboard = $this->getLeaderboard();
 
         return Inertia::render('Stats', [
-            'filters'    => ['project' => $projectId, 'category' => $categoryId, 'period' => $period],
+            'filters'    => ['project' => $projectId, 'category' => $categoryId, 'period' => $period, 'source' => $source],
             'projects'   => $user->projects()->orderBy('name')->get(['id', 'name'])->values(),
             'categories' => $user->categories()->orderBy('name')->get(['id', 'name'])->values(),
             'overview'   => [

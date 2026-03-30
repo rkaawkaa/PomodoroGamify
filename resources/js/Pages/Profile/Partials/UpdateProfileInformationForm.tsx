@@ -16,6 +16,7 @@ export default function UpdateProfileInformationForm({
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: user.name,
         email: user.email,
+        email_notifications: user.email_notifications ?? false,
     });
 
     const submit: FormEventHandler = (e) => {
@@ -80,6 +81,48 @@ export default function UpdateProfileInformationForm({
                 {status === 'verification-link-sent' && (
                     <p className="text-xs text-bloom">{t('auth.verify_email.sent')}</p>
                 )}
+
+                {/* Email recap notifications */}
+                <div className="rounded-xl border border-boundary/50 bg-abyss/40 p-4">
+                    <div className="flex items-start justify-between gap-4">
+                        <div>
+                            <p className="text-xs font-semibold text-moonbeam/90">{t('profile.email_notif.label')}</p>
+                            <p className="mt-0.5 text-[11px] leading-relaxed text-whisper/50">{t('profile.email_notif.hint')}</p>
+                        </div>
+                        {/* Toggle switch */}
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={data.email_notifications}
+                            onClick={() => setData('email_notifications', !data.email_notifications)}
+                            className={`relative mt-0.5 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
+                                data.email_notifications ? 'bg-bloom' : 'bg-boundary/60'
+                            }`}
+                        >
+                            <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform duration-200 ${
+                                    data.email_notifications ? 'translate-x-5' : 'translate-x-0'
+                                }`}
+                            />
+                        </button>
+                    </div>
+                    {data.email_notifications && (
+                        <ul className="mt-3 space-y-1 border-t border-boundary/30 pt-3">
+                            {[
+                                t('profile.email_notif.weekly'),
+                                t('profile.email_notif.monthly'),
+                                t('profile.email_notif.yearly'),
+                            ].map((item) => (
+                                <li key={item} className="flex items-center gap-2 text-[11px] text-whisper/60">
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-bloom/60">
+                                        <polyline points="2 6 5 9 10 3"/>
+                                    </svg>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
 
                 <div className="flex items-center gap-4 pt-1">
                     <button

@@ -127,6 +127,25 @@
     "locale.pt": "Português",
     "locale.de": "Deutsch",
 
+    "mail.recap.weekly_subject": "🌱 Your weekly recap — :name",
+    "mail.recap.monthly_subject": "🌺 Your monthly recap — :name",
+    "mail.recap.yearly_subject": "🎋 Your yearly recap — :name",
+    "mail.recap.greeting": "Hello :name 👋",
+    "mail.recap.intro": "Here is your :period recap on PomoBloom.",
+    "mail.recap.period_weekly": "weekly",
+    "mail.recap.period_monthly": "monthly",
+    "mail.recap.period_yearly": "yearly",
+    "mail.recap.overview": "Overview",
+    "mail.recap.sessions": "sessions",
+    "mail.recap.focus_time": "Focus time",
+    "mail.recap.active_days": "Active days",
+    "mail.recap.best_day": "Best day",
+    "mail.recap.by_project": "By project",
+    "mail.recap.by_category": "By category",
+    "mail.recap.no_sessions": "No sessions during this period.",
+    "mail.recap.cta": "View my statistics",
+    "mail.recap.footer": "Stay consistent. Every pomodoro counts.",
+
     "mail.welcome.subject": "Welcome to PomoBloom 🌸",
     "mail.welcome.greeting": "Hello :name,",
     "mail.welcome.intro": "Your account is ready. Focus, build your streak, unlock badges — your journey starts now.",
@@ -252,6 +271,12 @@
     "nav.my_profile": "My profile",
     "nav.edit_profile": "Edit my profile",
 
+    "profile.email_notif.label": "Email recaps",
+    "profile.email_notif.hint": "Receive a summary of your focus sessions by email.",
+    "profile.email_notif.weekly": "Weekly recap every Sunday at 7pm",
+    "profile.email_notif.monthly": "Monthly recap on the last day of the month",
+    "profile.email_notif.yearly": "Yearly recap on December 31st",
+
     "profile.page_subtitle": "Manage your account information and security.",
 
     "level.1": "Seed",
@@ -287,6 +312,10 @@
     "player.max_level": "Maximum level reached!",
     "player.progress_label": "Progress to level :n",
     "player.pts_remaining": ":n pts left",
+
+    "stats.source_all": "All",
+    "stats.source_real": "Timer",
+    "stats.source_declared": "Declared",
 
     "stats.page_title": "My statistics",
     "stats.tab_overview": "Overview",

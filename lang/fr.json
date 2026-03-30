@@ -127,6 +127,25 @@
     "locale.pt": "Português",
     "locale.de": "Deutsch",
 
+    "mail.recap.weekly_subject": "🌱 Ton bilan de la semaine — :name",
+    "mail.recap.monthly_subject": "🌺 Ton bilan du mois — :name",
+    "mail.recap.yearly_subject": "🎋 Ton bilan de l'année — :name",
+    "mail.recap.greeting": "Bonjour :name 👋",
+    "mail.recap.intro": "Voici ton bilan :period sur PomoBloom.",
+    "mail.recap.period_weekly": "de la semaine",
+    "mail.recap.period_monthly": "du mois",
+    "mail.recap.period_yearly": "de l'année",
+    "mail.recap.overview": "Vue d'ensemble",
+    "mail.recap.sessions": "sessions",
+    "mail.recap.focus_time": "Temps de focus",
+    "mail.recap.active_days": "Jours actifs",
+    "mail.recap.best_day": "Meilleure journée",
+    "mail.recap.by_project": "Par projet",
+    "mail.recap.by_category": "Par catégorie",
+    "mail.recap.no_sessions": "Aucune session sur cette période.",
+    "mail.recap.cta": "Voir mes statistiques",
+    "mail.recap.footer": "La régularité fait la différence. Chaque pomodoro compte.",
+
     "mail.welcome.subject": "Bienvenue sur PomoBloom 🌸",
     "mail.welcome.greeting": "Bonjour :name,",
     "mail.welcome.intro": "Votre compte est prêt. Concentrez-vous, construisez votre série, débloquez des badges — votre aventure commence maintenant.",
@@ -252,6 +271,12 @@
     "nav.my_profile": "Mon profil",
     "nav.edit_profile": "Modifier mon profil",
 
+    "profile.email_notif.label": "Récaps par e-mail",
+    "profile.email_notif.hint": "Reçois un résumé de tes sessions focus par e-mail.",
+    "profile.email_notif.weekly": "Bilan hebdomadaire chaque dimanche à 19h",
+    "profile.email_notif.monthly": "Bilan mensuel le dernier jour du mois",
+    "profile.email_notif.yearly": "Bilan annuel le 31 décembre",
+
     "profile.page_subtitle": "Gérez vos informations et la sécurité de votre compte.",
 
     "level.1": "Graine",
@@ -287,6 +312,10 @@
     "player.max_level": "Niveau maximum atteint !",
     "player.progress_label": "Progression vers le niveau :n",
     "player.pts_remaining": "encore :n pts",
+
+    "stats.source_all": "Toutes",
+    "stats.source_real": "Timer",
+    "stats.source_declared": "Déclarées",
 
     "stats.page_title": "Mes statistiques",
     "stats.tab_overview": "Vue d'ensemble",

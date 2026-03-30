@@ -13,6 +13,7 @@ interface Filters {
     project: number | null;
     category: number | null;
     period: 'today' | 'week' | 'month' | 'all';
+    source: 'all' | 'real' | 'declared';
 }
 interface ProjectItem  { id: number; name: string }
 interface CategoryItem { id: number; name: string }
@@ -26,7 +27,7 @@ interface Overview {
 interface ChartDay  { label: string; date: string; sessions: number; today: boolean }
 interface ChartWeek { label: string; sessions: number; current: boolean }
 interface HistorySession {
-    id: number; ended_at: string; duration_seconds: number;
+    id: number; ended_at: string; duration_seconds: number; is_declared: boolean;
     project: { id: number; name: string } | null;
     categories: Array<{ id: number; name: string }>;
     tasks: Array<{ id: number; title: string; done: boolean }>;
@@ -486,6 +487,28 @@ export default function Stats({
                         ))}
                     </div>
 
+                    {/* Source pills */}
+                    <div className="flex rounded-xl border border-white/10 bg-depth/60 p-1">
+                        {([
+                            { key: 'all',      label: t('stats.source_all') },
+                            { key: 'real',     label: t('stats.source_real') },
+                            { key: 'declared', label: t('stats.source_declared') },
+                        ] as const).map((s) => (
+                            <button
+                                key={s.key}
+                                type="button"
+                                onClick={() => applyFilter({ source: s.key, history_page: 1 })}
+                                className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all ${
+                                    filters.source === s.key
+                                        ? 'bg-aurora/70 text-white shadow-sm'
+                                        : 'text-whisper/60 hover:text-moonbeam'
+                                }`}
+                            >
+                                {s.label}
+                            </button>
+                        ))}
+                    </div>
+
                     {/* Custom project select */}
                     <FilterSelect
                         value={filters.project ? String(filters.project) : ''}
@@ -709,10 +732,21 @@ function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) =>
     const pendingTasks = session.tasks.filter((task) => !task.done);
 
     return (
-        <div className="rounded-2xl border border-white/8 bg-depth/50 p-4 transition-colors hover:bg-depth/80">
+        <div className={`rounded-2xl border p-4 transition-colors ${
+            session.is_declared
+                ? 'border-aurora/15 bg-aurora/5 hover:bg-aurora/8'
+                : 'border-white/8 bg-depth/50 hover:bg-depth/80'
+        }`}>
             <div className="mb-3 flex items-start justify-between gap-3">
                 <div>
-                    <div className="text-[12px] font-semibold text-moonbeam/90">{fmtDate(session.ended_at)}</div>
+                    <div className="flex items-center gap-2">
+                        <div className="text-[12px] font-semibold text-moonbeam/90">{fmtDate(session.ended_at)}</div>
+                        {session.is_declared && (
+                            <span className="rounded-full border border-aurora/30 bg-aurora/12 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-aurora/70">
+                                {t('stats.source_declared')}
+                            </span>
+                        )}
+                    </div>
                     <div className="text-[10px] text-whisper/50">{fmtTime(session.ended_at)}</div>
                 </div>
                 <span className="rounded-full bg-ember/15 px-2.5 py-1 font-mono text-[12px] font-bold text-ember">

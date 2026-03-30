@@ -57,6 +57,7 @@ export interface User {
     locale: Locale;
     email_verified_at?: string;
     points: number;
+    email_notifications: boolean;
 }
 
 export type PageProps<
