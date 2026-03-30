@@ -15,11 +15,13 @@ class PomodoroSession extends Model
         'duration_seconds',
         'started_at',
         'ended_at',
+        'is_declared',
     ];
 
     protected $casts = [
-        'started_at' => 'datetime',
-        'ended_at'   => 'datetime',
+        'started_at'  => 'datetime',
+        'ended_at'    => 'datetime',
+        'is_declared' => 'boolean',
     ];
 
     public function user(): BelongsTo

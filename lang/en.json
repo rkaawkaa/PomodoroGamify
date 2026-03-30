@@ -326,6 +326,16 @@
     "stats.lb_empty": "No sessions this week. Start one!",
     "stats.you": "you",
 
+    "declare.button": "Declare a past session",
+    "declare.title": "Declare a session",
+    "declare.hint": "Worked without a timer? Log your session manually.",
+    "declare.date": "Date & time",
+    "declare.duration": "Duration",
+    "declare.duration_min": "min",
+    "declare.submit": "Save session",
+    "declare.success": "Session recorded!",
+    "declare.points_earned": "+:n pts earned",
+
     "footer.legal": "Legal",
     "footer.privacy": "Privacy",
     "footer.help": "Help",

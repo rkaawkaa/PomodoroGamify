@@ -326,6 +326,16 @@
     "stats.lb_empty": "Aucune session cette semaine. Lance-toi !",
     "stats.you": "toi",
 
+    "declare.button": "Déclarer une session passée",
+    "declare.title": "Déclarer une session",
+    "declare.hint": "Tu as travaillé sans timer ? Enregistre ta session manuellement.",
+    "declare.date": "Date et heure",
+    "declare.duration": "Durée",
+    "declare.duration_min": "min",
+    "declare.submit": "Valider la session",
+    "declare.success": "Session enregistrée !",
+    "declare.points_earned": "+:n pts gagnés",
+
     "footer.legal": "Mentions légales",
     "footer.privacy": "Confidentialité",
     "footer.help": "Aide",

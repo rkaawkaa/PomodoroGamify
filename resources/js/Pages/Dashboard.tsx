@@ -1,4 +1,5 @@
 import CategoryMultiSelect from '@/Components/CategoryMultiSelect';
+import DeclareSessionModal from '@/Components/DeclareSessionModal';
 import GoalsModal from '@/Components/GoalsModal';
 import ItemSelect from '@/Components/ItemSelect';
 import LevelUpModal from '@/Components/LevelUpModal';
@@ -119,10 +120,11 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
     const [onboardingDone, setOnboardingDone] = useState(onboardingCompleted);
 
     // Modals
-    const [settingsOpen, setSettingsOpen] = useState(false);
-    const [manageOpen, setManageOpen] = useState(() => new URLSearchParams(window.location.search).get('manage') === '1');
-    const [goalsOpen, setGoalsOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen]   = useState(false);
+    const [manageOpen, setManageOpen]       = useState(() => new URLSearchParams(window.location.search).get('manage') === '1');
+    const [goalsOpen, setGoalsOpen]         = useState(false);
     const [victoryWallOpen, setVictoryWallOpen] = useState(false);
+    const [declareOpen, setDeclareOpen]     = useState(false);
     const [pendingVictoryMessage, setPendingVictoryMessage] = useState<VictoryMessage | null>(null);
 
     // Goals + points state (updated optimistically)
@@ -820,6 +822,18 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     </button>
                 </div>
 
+                {/* ── Declare a past session ── */}
+                <button
+                    type="button"
+                    onClick={() => setDeclareOpen(true)}
+                    className="mt-3 flex items-center gap-1.5 text-[10px] font-medium text-whisper/35 transition-colors hover:text-whisper/70"
+                >
+                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                        <path d="M6 1v10M1 6h10"/>
+                    </svg>
+                    {t('declare.button')}
+                </button>
+
             </div>
 
             {settingsOpen && (
@@ -900,6 +914,28 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
             {!onboardingDone && (
                 <OnboardingModal onDismiss={() => setOnboardingDone(true)} />
             )}
+
+            <DeclareSessionModal
+                open={declareOpen}
+                onClose={() => setDeclareOpen(false)}
+                projects={projects}
+                categories={categories}
+                onSaved={(result) => {
+                    // Increment today's counter if the declared session was for today
+                    const endedDate = new Date(result.ended_at).toDateString();
+                    const todayStr  = new Date().toDateString();
+                    if (endedDate === todayStr) setTodayCount((c) => c + 1);
+
+                    if (result.total_earned > 0) {
+                        updateUserPoints(result.user_points);
+                        setPendingReward({
+                            awards:      result.awards,
+                            totalEarned: result.total_earned,
+                            userPoints:  result.user_points,
+                        });
+                    }
+                }}
+            />
         </AuthenticatedLayout>
         </>
     );

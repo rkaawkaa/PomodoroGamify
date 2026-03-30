@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DeclaredSessionController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MessageLikeController;
@@ -90,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
 
     Route::post('/pomodoro-sessions', [PomodoroSessionController::class, 'store'])->name('pomodoro-sessions.store');
+    Route::post('/sessions/declare', [DeclaredSessionController::class, 'store'])->name('sessions.declare');
 
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
     Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
