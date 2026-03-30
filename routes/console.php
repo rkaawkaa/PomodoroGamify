@@ -27,3 +27,6 @@ Schedule::command('recap:send yearly')
     ->cron('0 18 31 12 *')
     ->withoutOverlapping()
     ->runInBackground();
+
+
+Schedule::command('inspire')->everyMinute();
