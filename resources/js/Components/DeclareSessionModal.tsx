@@ -136,10 +136,12 @@ export default function DeclareSessionModal({ open, onClose, projects, categorie
             />
 
             {/* Panel */}
-            <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-t-3xl border border-boundary/60 bg-depth shadow-2xl sm:rounded-3xl">
+            <div className="relative z-10 w-full max-w-sm rounded-t-3xl border border-boundary/60 bg-depth shadow-2xl sm:rounded-3xl">
 
                 {/* Accent bar */}
-                <div className="h-0.5 w-full bg-gradient-to-r from-aurora via-bloom/50 to-aurora" />
+                <div className="overflow-hidden rounded-t-3xl sm:rounded-t-3xl">
+                    <div className="h-0.5 w-full bg-gradient-to-r from-aurora via-bloom/50 to-aurora" />
+                </div>
 
                 <div className="px-6 pb-8 pt-5">
 
