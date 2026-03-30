@@ -233,7 +233,7 @@ export default function DeclareSessionModal({ open, onClose, projects, categorie
                                             value={customInput}
                                             onChange={(e) => handleCustomChange(e.target.value)}
                                             onFocus={() => setIsCustom(true)}
-                                            className={`w-12 bg-transparent text-center text-[12px] font-semibold outline-none ${
+                                            className={`w-20 bg-transparent text-center text-[12px] font-semibold outline-none ${
                                                 isCustom ? 'text-aurora' : 'text-whisper/70'
                                             }`}
                                         />
