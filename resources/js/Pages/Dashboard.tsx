@@ -75,7 +75,7 @@ function playSound(type: 'focus' | 'break') {
             beep(784, 0.48, 0.45); // G5
         } else {
             beep(659, 0,    0.30); // E5
-            beep(523, 0.35, 0.45); // C5
+            beep(523, 0.35, 0.451); // C5
         }
     } catch { /* AudioContext blocked — silent fail */ }
 }
