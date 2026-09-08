@@ -8,7 +8,7 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// ── Recap emails ──────────────────────────────────────────────────────────────
+// Recap emails
 
 // Weekly recap — every Sunday at 19:00
 Schedule::command('recap:send weekly')

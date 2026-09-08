@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class PointService
 {
-    // ─── Public API ──────────────────────────────────────────────────────────
+    // Public API
 
     /**
      * Award points for a completed pomodoro session.
@@ -149,7 +149,7 @@ class PointService
         return $awards;
     }
 
-    // ─── Private helpers ─────────────────────────────────────────────────────
+    // Private helpers
 
     private function award(string $eventKey, int $points, ?array $meta = null): array
     {
@@ -177,7 +177,7 @@ class PointService
         $user->increment('points', $total);
     }
 
-    // ─── DB queries ──────────────────────────────────────────────────────────
+    // DB queries
 
     private function todayPomodoroCount(User $user): int
     {

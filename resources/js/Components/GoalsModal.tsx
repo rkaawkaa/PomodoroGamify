@@ -188,7 +188,7 @@ export default function GoalsModal({ goals, projects, onClose, onSaved }: Props)
                 {/* Body (scrollable) */}
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
 
-                    {/* ── Daily goal ── */}
+                    {/* Daily goal */}
                     <section className="space-y-3">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-ember">
@@ -222,7 +222,7 @@ export default function GoalsModal({ goals, projects, onClose, onSaved }: Props)
                         )}
                     </section>
 
-                    {/* ── Monthly goals ── */}
+                    {/* Monthly goals */}
                     <section className="space-y-3 border-t border-boundary pt-4">
                         <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-bloom">
                             {t('goals.monthly_goal')}

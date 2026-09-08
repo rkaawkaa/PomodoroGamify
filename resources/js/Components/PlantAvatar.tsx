@@ -1,4 +1,4 @@
-// ─── PlantAvatar ────────────────────────────────────────────────────────────
+// PlantAvatar
 // 20 humanized plant SVG avatars, one per level.
 // All share a 64×64 viewBox and render at arbitrary `size`.
 
@@ -24,12 +24,12 @@ export default function PlantAvatar({ level, size = 40, className = '' }: Props)
     );
 }
 
-// ─── Per-level SVG content ──────────────────────────────────────────────────
+// Per-level SVG content
 
 function renderPlant(level: number): JSX.Element {
     switch (level) {
 
-        // ── L1 · Graine / Seed ───────────────────────────────────────────────
+        // L1 · Graine / Seed
         case 1: return (
             <>
                 <ellipse cx="32" cy="55" rx="20" ry="4" fill="#78350f"/>
@@ -47,7 +47,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L2 · Germe / Sprout ───────────────────────────────────────────────
+        // L2 · Germe / Sprout
         case 2: return (
             <>
                 <ellipse cx="32" cy="55" rx="18" ry="4" fill="#78350f"/>
@@ -62,7 +62,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L3 · Plantule / Seedling ──────────────────────────────────────────
+        // L3 · Plantule / Seedling
         case 3: return (
             <>
                 <path d="M21 51 L23 61 L41 61 L43 51 Z" fill="#c2410c"/>
@@ -80,7 +80,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L4 · Bourgeon / Bud ───────────────────────────────────────────────
+        // L4 · Bourgeon / Bud
         case 4: return (
             <>
                 <path d="M20 51 L22 61 L42 61 L44 51 Z" fill="#c2410c"/>
@@ -99,7 +99,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L5 · Petite tige / Little Stem ────────────────────────────────────
+        // L5 · Petite tige / Little Stem
         case 5: return (
             <>
                 <ellipse cx="32" cy="56" rx="16" ry="4" fill="#78350f"/>
@@ -122,7 +122,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L6 · Feuillage / Leafling ─────────────────────────────────────────
+        // L6 · Feuillage / Leafling
         case 6: return (
             <>
                 <ellipse cx="32" cy="57" rx="18" ry="4" fill="#78350f"/>
@@ -146,7 +146,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L7 · Arbuste / Shrub ──────────────────────────────────────────────
+        // L7 · Arbuste / Shrub
         case 7: return (
             <>
                 <ellipse cx="32" cy="57" rx="20" ry="4" fill="#78350f"/>
@@ -164,7 +164,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L8 · Floraison / Blossom ──────────────────────────────────────────
+        // L8 · Floraison / Blossom
         case 8: return (
             <>
                 <ellipse cx="32" cy="57" rx="20" ry="4" fill="#78350f"/>
@@ -190,7 +190,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L9 · Jeune arbre / Sapling ────────────────────────────────────────
+        // L9 · Jeune arbre / Sapling
         case 9: return (
             <>
                 <ellipse cx="32" cy="59" rx="20" ry="4" fill="#78350f"/>
@@ -209,7 +209,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L10 · Plante épanouie / Full Bloom ────────────────────────────────
+        // L10 · Plante épanouie / Full Bloom
         case 10: return (
             <>
                 <ellipse cx="32" cy="59" rx="22" ry="4" fill="#78350f"/>
@@ -233,7 +233,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L11 · Plante tropicale / Tropical Plant ────────────────────────────
+        // L11 · Plante tropicale / Tropical Plant
         case 11: return (
             <>
                 <ellipse cx="32" cy="59" rx="18" ry="4" fill="#78350f"/>
@@ -252,7 +252,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L12 · Fougère ancestrale / Ancient Fern ────────────────────────────
+        // L12 · Fougère ancestrale / Ancient Fern
         case 12: return (
             <>
                 <ellipse cx="32" cy="59" rx="18" ry="4" fill="#78350f"/>
@@ -281,7 +281,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L13 · Bambou serein / Serene Bamboo ────────────────────────────────
+        // L13 · Bambou serein / Serene Bamboo
         case 13: return (
             <>
                 <ellipse cx="32" cy="59" rx="18" ry="4" fill="#78350f"/>
@@ -302,7 +302,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L14 · Bonsaï zen / Zen Bonsai ─────────────────────────────────────
+        // L14 · Bonsaï zen / Zen Bonsai
         case 14: return (
             <>
                 {/* decorative pot */}
@@ -324,7 +324,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L15 · Cactus sage / Desert Sage ────────────────────────────────────
+        // L15 · Cactus sage / Desert Sage
         case 15: return (
             <>
                 <ellipse cx="32" cy="59" rx="18" ry="4" fill="#78350f"/>
@@ -352,7 +352,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L16 · Arbre sacré / Sacred Tree ────────────────────────────────────
+        // L16 · Arbre sacré / Sacred Tree
         case 16: return (
             <>
                 <ellipse cx="32" cy="59" rx="24" ry="4" fill="#78350f"/>
@@ -381,7 +381,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L17 · Forêt enchantée / Enchanted Forest ───────────────────────────
+        // L17 · Forêt enchantée / Enchanted Forest
         case 17: return (
             <>
                 <ellipse cx="32" cy="59" rx="22" ry="4" fill="#4c1d95"/>
@@ -411,7 +411,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L18 · Druide végétal / Plant Druid ─────────────────────────────────
+        // L18 · Druide végétal / Plant Druid
         case 18: return (
             <>
                 <ellipse cx="32" cy="59" rx="24" ry="4" fill="#3b0764"/>
@@ -440,7 +440,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L19 · Gardien de la nature / Nature Guardian ───────────────────────
+        // L19 · Gardien de la nature / Nature Guardian
         case 19: return (
             <>
                 <ellipse cx="32" cy="59" rx="26" ry="4" fill="#164e63"/>
@@ -468,7 +468,7 @@ function renderPlant(level: number): JSX.Element {
             </>
         );
 
-        // ── L20 · Esprit du jardin / Garden Spirit ──────────────────────────────
+        // L20 · Esprit du jardin / Garden Spirit
         default: return (
             <>
                 {/* radiant aura rings */}

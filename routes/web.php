@@ -6,7 +6,6 @@ use App\Http\Controllers\DeclaredSessionController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MessageLikeController;
-use App\Http\Controllers\SocialProofController;
 use App\Http\Controllers\StatsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PomodoroSessionController;
@@ -125,8 +124,6 @@ Route::get('/landing', function () {
     return Inertia::render('Landing');
 })->name('landing');
 
-Route::get('/social-proof', [SocialProofController::class, 'index'])->name('social-proof');
-
 Route::get('/guide', function () {
     return Inertia::render('Help');
 })->name('help');
@@ -141,7 +138,7 @@ Route::get('/privacy', function () {
 
 Route::post('/locale', [LocaleController::class, 'update'])->name('locale.update');
 
-// ── Admin panel ────────────────────────────────────────────────────────────
+// Admin panel
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login',  [AdminController::class, 'loginForm'])->name('login');
     Route::post('/login', [AdminController::class, 'login'])->name('login.post');

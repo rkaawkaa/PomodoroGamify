@@ -13,7 +13,7 @@ class AdminController extends Controller
     private const ADMIN_PASSWORD = 'Rpgange11!';
     private const SESSION_KEY    = 'admin_auth';
 
-    // ── Login form ────────────────────────────────────────────────────────
+    // Login form
 
     public function loginForm()
     {
@@ -24,7 +24,7 @@ class AdminController extends Controller
         return view('admin.login');
     }
 
-    // ── Handle login ──────────────────────────────────────────────────────
+    // Handle login
 
     public function login(Request $request)
     {
@@ -39,7 +39,7 @@ class AdminController extends Controller
         return back()->withErrors(['credentials' => 'Identifiants incorrects.'])->withInput();
     }
 
-    // ── Logout ────────────────────────────────────────────────────────────
+    // Logout
 
     public function logout(Request $request)
     {
@@ -47,7 +47,7 @@ class AdminController extends Controller
         return redirect()->route('admin.login');
     }
 
-    // ── Dashboard ─────────────────────────────────────────────────────────
+    // Dashboard
 
     public function dashboard(Request $request)
     {

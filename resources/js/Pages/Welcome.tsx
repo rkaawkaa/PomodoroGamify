@@ -4,7 +4,6 @@ import GuestSettingsModal from "@/Components/GuestSettingsModal";
 import GuestTaskList from "@/Components/GuestTaskList";
 import GuestUpsellModal from "@/Components/GuestUpsellModal";
 import LocaleSwitcher from "@/Components/LocaleSwitcher";
-import SocialProof from "@/Components/SocialProof";
 import ThemePicker from "@/Components/ThemePicker";
 import TimerIllustration from "@/Components/TimerIllustration";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
@@ -13,7 +12,7 @@ import { PageProps, PomodoroSettings, User } from "@/types";
 import { Head, Link } from "@inertiajs/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+// Helpers
 function pad(n: number) {
     return String(n).padStart(2, "0");
 }
@@ -30,7 +29,7 @@ const DEFAULT_SETTINGS: PomodoroSettings = {
 type TimerMode = "focus" | "break";
 type TimerState = "idle" | "running" | "paused";
 
-// ─── Audio (Web Audio API, no asset files) ─────────────────────────────────
+// Audio (Web Audio API, no asset files)
 function playSound(type: "focus" | "break") {
     try {
         const ctx = new AudioContext();
@@ -96,27 +95,27 @@ function playWarningSound() {
     }
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// Page
 export default function Welcome({ auth }: PageProps) {
     const { t, locale } = useTranslation();
     const user = (auth.user as User | null) ?? null;
 
-    // ── Settings persisted in localStorage ───────────────────────────────
+    // Settings persisted in localStorage
     const [settings, setSettings] = useLocalStorage<PomodoroSettings>(
         "pomobloom_guest_settings",
         DEFAULT_SETTINGS,
     );
 
-    // ── Modals ────────────────────────────────────────────────────────────
+    // Modals
     const [settingsOpen, setSettingsOpen] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // ── Guest upsell (shown every 5 completed pomodoros) ──────────────────
+    // Guest upsell (shown every 5 completed pomodoros)
     const pomodoroCountRef = useRef(0);
     const [showUpsellModal, setShowUpsellModal] = useState(false);
     const userRef = useRef(user);
 
-    // ── Timer state machine ───────────────────────────────────────────────
+    // Timer state machine
     const [mode, setMode] = useState<TimerMode>("focus");
     const [timerState, setTimerState] = useState<TimerState>("idle");
     const [remaining, setRemaining] = useState(settings.pomodoro_duration * 60);
@@ -150,7 +149,7 @@ export default function Welcome({ auth }: PageProps) {
 
     const autoStartNextRef = useRef(false);
 
-    // ── Notifications ─────────────────────────────────────────────────────
+    // Notifications
     const swRegRef = useRef<ServiceWorkerRegistration | null>(null);
     const [notifPermission, setNotifPermission] =
         useState<NotificationPermission>(
@@ -202,7 +201,7 @@ export default function Welcome({ auth }: PageProps) {
         notifyRef.current = notify;
     }, [notify]);
 
-    // ── Phase transitions ─────────────────────────────────────────────────
+    // Phase transitions
     const goToBreak = useCallback(() => {
         const s = settingsRef.current;
         const total = s.break_duration * 60;
@@ -349,7 +348,7 @@ export default function Welcome({ auth }: PageProps) {
         };
     }, []);
 
-    // ── User actions ──────────────────────────────────────────────────────
+    // User actions
     const handleStart = useCallback(() => setTimerState("running"), []);
     const handlePause = useCallback(() => setTimerState("paused"), []);
     const handleResume = useCallback(() => setTimerState("running"), []);
@@ -369,7 +368,7 @@ export default function Welcome({ auth }: PageProps) {
         else endBreakRef.current();
     }, []);
 
-    // ── Derived ───────────────────────────────────────────────────────────
+    // Derived
     const isFocus = mode === "focus";
     const isActive = timerState !== "idle";
     const minutes = Math.floor(remaining / 60);
@@ -420,7 +419,7 @@ export default function Welcome({ auth }: PageProps) {
             </Head>
 
             <div className="flex min-h-screen flex-col bg-abyss bg-gradient-to-b from-ember/[0.10] via-transparent to-bloom/[0.07]">
-                {/* ── Top bar ─────────────────────────────────────────────── */}
+                {/* Top bar */}
                 <div className="relative">
                     <header className="flex items-center justify-between px-6 py-4">
                         <div className="flex items-center gap-2.5 text-ember">
@@ -594,7 +593,7 @@ export default function Welcome({ auth }: PageProps) {
                     )}
                 </div>
 
-                {/* ── Timer area ──────────────────────────────────────────── */}
+                {/* Timer area */}
                 <main className="flex flex-1 flex-col items-center px-4 pb-16 pt-4">
                     <div className="w-full max-w-xs rounded-3xl border border-whisper/10 bg-depth shadow-2xl shadow-black/70">
                         {/* Top gradient accent */}
@@ -822,13 +821,6 @@ export default function Welcome({ auth }: PageProps) {
                             </div>
                         </div>
                     </div>
-
-                    {/* Social proof + upsell — outside the timer card, guests only */}
-                    {!user && (
-                        <div className="mt-5 flex flex-col items-center gap-3">
-                            <SocialProof showCta />
-                        </div>
-                    )}
                 </main>
             </div>
 

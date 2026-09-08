@@ -11,7 +11,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-// ─── Article data ──────────────────────────────────────────────────────────
+// Article data
 
 interface Article {
     id: string;
@@ -208,7 +208,7 @@ const articles: Article[] = [
     },
 ];
 
-// ─── Article card ──────────────────────────────────────────────────────────
+// Article card
 
 function ArticleCard({ article, locale }: { article: Article; locale: string }) {
     const isFr = locale === 'fr';
@@ -258,7 +258,7 @@ function ArticleCard({ article, locale }: { article: Article; locale: string }) 
     );
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// Page
 
 export default function Help({ auth }: PageProps) {
     const { t, locale } = useTranslation();
@@ -287,7 +287,7 @@ export default function Help({ auth }: PageProps) {
 
             <div className="flex min-h-screen flex-col bg-abyss bg-gradient-to-b from-ember/[0.07] via-transparent to-bloom/[0.05]">
 
-                {/* ── Nav ─────────────────────────────────────────────────── */}
+                {/* Nav */}
                 <header className="sticky top-0 z-40 border-b border-boundary/40 bg-depth/90 backdrop-blur-sm">
                     <div className="mx-auto flex h-14 max-w-3xl items-center justify-between px-4 sm:px-6">
                         <Link
@@ -305,7 +305,7 @@ export default function Help({ auth }: PageProps) {
                     </div>
                 </header>
 
-                {/* ── Hero ────────────────────────────────────────────────── */}
+                {/* Hero */}
                 <div className="mx-auto w-full max-w-3xl px-4 pb-4 pt-12 sm:px-6">
                     <div className="mb-2 flex items-center gap-2">
                         <span className="text-2xl">📖</span>
@@ -338,7 +338,7 @@ export default function Help({ auth }: PageProps) {
                     </div>
                 </div>
 
-                {/* ── How it works ────────────────────────────────────────── */}
+                {/* How it works */}
                 <section className="mx-auto w-full max-w-3xl px-4 pb-8 sm:px-6">
                     <div className="rounded-3xl border border-ember/20 bg-ember/5 px-6 py-6 sm:px-8">
                         <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-moonbeam">
@@ -365,14 +365,14 @@ export default function Help({ auth }: PageProps) {
                     </div>
                 </section>
 
-                {/* ── Articles ────────────────────────────────────────────── */}
+                {/* Articles */}
                 <section className="mx-auto w-full max-w-3xl space-y-8 px-4 pb-16 sm:px-6">
                     {articles.map((article) => (
                         <ArticleCard key={article.id} article={article} locale={locale} />
                     ))}
                 </section>
 
-                {/* ── Contact ─────────────────────────────────────────────── */}
+                {/* Contact */}
                 <section className="mx-auto w-full max-w-3xl px-4 pb-8 sm:px-6">
                     <div className="rounded-3xl border border-boundary/30 bg-surface/10 px-6 py-5 sm:px-8">
                         <p className="text-sm font-semibold text-moonbeam">
@@ -387,7 +387,7 @@ export default function Help({ auth }: PageProps) {
                     </div>
                 </section>
 
-                {/* ── Footer CTA ──────────────────────────────────────────── */}
+                {/* Footer CTA */}
                 {!user && (
                     <div className="mx-auto w-full max-w-3xl px-4 pb-16 sm:px-6">
                         <div className="rounded-3xl border border-ember/25 bg-ember/8 px-6 py-8 text-center">

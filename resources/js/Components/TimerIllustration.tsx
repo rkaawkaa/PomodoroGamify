@@ -44,7 +44,7 @@ function useAnimation(timerState: TimerState, isFocus: boolean, breathe = 'timer
         : `${idle} 5s ease-in-out infinite`;
 }
 
-// ─── Plant ──────────────────────────────────────────────────────────────────
+// Plant
 function PlantMascot({ timerState, isFocus }: Props) {
     const stem   = isFocus ? '#22c55e' : '#a78bfa';
     const leaf   = isFocus ? '#4ade80' : '#c4b5fd';
@@ -72,7 +72,7 @@ function PlantMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Warrior ────────────────────────────────────────────────────────────────
+// Warrior
 function WarriorMascot({ timerState, isFocus }: Props) {
     const helmColor = isFocus ? '#9f1239' : '#1e40af';
     const armorColor = isFocus ? '#b91c1c' : '#1d4ed8';
@@ -113,7 +113,7 @@ function WarriorMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Scientist ───────────────────────────────────────────────────────────────
+// Scientist
 function ScientistMascot({ timerState, isFocus }: Props) {
     const coatColor = isFocus ? '#e0f2fe' : '#ede9fe';
     const accentColor = isFocus ? '#0284c7' : '#7c3aed';
@@ -156,7 +156,7 @@ function ScientistMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Medieval ────────────────────────────────────────────────────────────────
+// Medieval
 function MedievalMascot({ timerState, isFocus }: Props) {
     const robe = isFocus ? '#7c2d12' : '#312e81';
     const accent = isFocus ? '#d97706' : '#6d28d9';
@@ -199,7 +199,7 @@ function MedievalMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Space ───────────────────────────────────────────────────────────────────
+// Space
 function SpaceMascot({ timerState, isFocus }: Props) {
     const suit = isFocus ? '#4c1d95' : '#1e3a8a';
     const visor = isFocus ? '#7c3aed80' : '#1d4ed880';
@@ -241,7 +241,7 @@ function SpaceMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Girly / Kawaii ──────────────────────────────────────────────────────────
+// Girly / Kawaii
 function GirlyMascot({ timerState, isFocus }: Props) {
     const mainColor = isFocus ? '#f472b6' : '#a855f7';
     const lightColor = isFocus ? '#fce7f3' : '#f3e8ff';
@@ -284,7 +284,7 @@ function GirlyMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Animals ─────────────────────────────────────────────────────────────────
+// Animals
 function AnimalsMascot({ timerState, isFocus }: Props) {
     const earColor = isFocus ? '#f97316' : '#d97706';
     const bodyColor = isFocus ? '#f97316' : '#d97706';
@@ -322,7 +322,7 @@ function AnimalsMascot({ timerState, isFocus }: Props) {
     );
 }
 
-// ─── Main component ──────────────────────────────────────────────────────────
+// Main component
 const MASCOTS: Record<string, React.FC<Props>> = {
     plant:     PlantMascot,
     warrior:   WarriorMascot,

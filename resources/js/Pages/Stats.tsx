@@ -7,7 +7,7 @@ import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 
-// ─── Types ──────────────────────────────────────────────────────────────────
+// Types
 
 interface Filters {
     project: number | null;
@@ -52,7 +52,7 @@ type Props = PageProps<{
     userId: number;
 }>;
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// Helpers
 
 function fmtSeconds(s: number): string {
     const h = Math.floor(s / 3600);
@@ -67,7 +67,7 @@ function fmtTime(iso: string): string {
     return new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
-// ─── FilterSelect ────────────────────────────────────────────────────────────
+// FilterSelect
 
 function FilterSelect({
     value,
@@ -162,7 +162,7 @@ function FilterSelect({
     );
 }
 
-// ─── BarChart ────────────────────────────────────────────────────────────────
+// BarChart
 
 function BarChart({
     data,
@@ -249,7 +249,7 @@ function BarChart({
     );
 }
 
-// ─── KpiCard ─────────────────────────────────────────────────────────────────
+// KpiCard
 
 function KpiCard({
     value, label, colorClass, fromClass, toClass, borderClass, glowStyle, icon,
@@ -287,7 +287,7 @@ function KpiCard({
     );
 }
 
-// ─── LeaderRow ───────────────────────────────────────────────────────────────
+// LeaderRow
 
 function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: LeaderboardEntry; isCurrentUser: boolean }) {
     const { t } = useTranslation();
@@ -326,7 +326,7 @@ function LeaderRow({ rank, entry, isCurrentUser }: { rank: number; entry: Leader
     );
 }
 
-// ─── KPI config ──────────────────────────────────────────────────────────────
+// KPI config
 
 const KPI_CONFIGS = [
     {
@@ -386,7 +386,7 @@ const KPI_CONFIGS = [
     },
 ];
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// Main page
 
 export default function Stats({
     filters, projects, categories, overview,
@@ -450,7 +450,7 @@ export default function Stats({
 
             <div className="mx-auto w-full max-w-3xl px-4 pb-16 pt-6 sm:px-6">
 
-                {/* ── Back + title ─────────────────────────────────────── */}
+                {/* Back + title */}
                 <div className="mb-6 flex items-center gap-3">
                     <Link
                         href={route('dashboard')}
@@ -467,7 +467,7 @@ export default function Stats({
                     </h1>
                 </div>
 
-                {/* ── Filter bar ─────────────────────────────────────────── */}
+                {/* Filter bar */}
                 <div className="mb-5 flex flex-wrap items-center gap-2">
                     {/* Period pills */}
                     <div className="flex rounded-xl border border-white/10 bg-depth/60 p-1">
@@ -528,7 +528,7 @@ export default function Stats({
                     />
                 </div>
 
-                {/* ── Tabs ───────────────────────────────────────────────── */}
+                {/* Tabs */}
                 <div className="mb-6 flex gap-1 rounded-2xl border border-white/8 bg-depth/40 p-1.5">
                     {(['overview', 'history', 'leaderboard'] as Tab[]).map((t_) => (
                         <button
@@ -546,7 +546,7 @@ export default function Stats({
                     ))}
                 </div>
 
-                {/* ══ OVERVIEW ═══════════════════════════════════════════════ */}
+                {/* Overview tab */}
                 {tab === 'overview' && (
                     <div className="space-y-5">
 
@@ -626,7 +626,7 @@ export default function Stats({
                     </div>
                 )}
 
-                {/* ══ HISTORY ════════════════════════════════════════════════ */}
+                {/* History tab */}
                 {tab === 'history' && (
                     <div className="space-y-3">
                         <div className="space-y-2">
@@ -660,7 +660,7 @@ export default function Stats({
                     </div>
                 )}
 
-                {/* ══ LEADERBOARD ════════════════════════════════════════════ */}
+                {/* Leaderboard tab */}
                 {tab === 'leaderboard' && (
                     <div className="space-y-4">
                         <div className="flex items-center justify-between gap-3">
@@ -725,7 +725,7 @@ export default function Stats({
     );
 }
 
-// ─── HistoryRow ───────────────────────────────────────────────────────────────
+// HistoryRow
 
 function HistoryRow({ session, t }: { session: HistorySession; t: (k: string) => string }) {
     const doneTasks    = session.tasks.filter((task) => task.done);

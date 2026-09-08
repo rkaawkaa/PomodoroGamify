@@ -23,7 +23,7 @@ class StatsController extends Controller
                       : 'all';
         $histPage   = max(1, (int) $request->query('history_page', 1));
 
-        // ── Filtered query factory ──────────────────────────────────────────
+        // Filtered query factory
         $makeQuery = fn () => $user->pomodoroSessions()
             ->whereNotNull('ended_at')
             ->when($projectId,  fn ($q) => $q->where('project_id', $projectId))
@@ -34,21 +34,21 @@ class StatsController extends Controller
             ->when($source === 'real',     fn ($q) => $q->where('is_declared', false))
             ->when($source === 'declared', fn ($q) => $q->where('is_declared', true));
 
-        // ── Overview KPIs ───────────────────────────────────────────────────
+        // Overview KPIs
         $totalSessions = $makeQuery()->count();
         $totalSeconds  = (int) $makeQuery()->sum('duration_seconds');
 
-        // ── Streaks (always all-time, ignores project/category/period) ──────
+        // Streaks (always all-time, ignores project/category/period)
         ['current' => $currentStreak, 'best' => $bestStreak] = $this->calculateStreaks($user);
 
-        // ── Daily average (filtered) ────────────────────────────────────────
+        // Daily average (filtered)
         $dailyAvg = $this->getDailyAvg($makeQuery);
 
-        // ── Charts (project/category filtered, fixed window) ────────────────
+        // Charts (project/category filtered, fixed window)
         $dailyChart  = $this->getDailyChart($user, $projectId, $categoryId);
         $weeklyChart = $this->getWeeklyChart($user, $projectId, $categoryId);
 
-        // ── History (paginated, filtered) ───────────────────────────────────
+        // History (paginated, filtered)
         $history = $makeQuery()
             ->with(['project:id,name', 'categories:id,name', 'tasks:id,title,session_id,status'])
             ->orderBy('ended_at', 'desc')
@@ -63,7 +63,7 @@ class StatsController extends Controller
                 'tasks'            => $s->tasks->map(fn ($t) => ['id' => $t->id, 'title' => $t->title, 'done' => $t->status === 'done'])->values(),
             ]);
 
-        // ── Leaderboard (global, not filtered) ──────────────────────────────
+        // Leaderboard (global, not filtered)
         $leaderboard = $this->getLeaderboard();
 
         return Inertia::render('Stats', [
@@ -86,7 +86,7 @@ class StatsController extends Controller
         ]);
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
+    // Helpers
 
     private function calculateStreaks(User $user): array
     {

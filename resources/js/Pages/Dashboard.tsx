@@ -7,7 +7,6 @@ import ManageItemsModal from '@/Components/ManageItemsModal';
 import OnboardingModal from '@/Components/OnboardingModal';
 import PointsReward from '@/Components/PointsReward';
 import PomodoroSettingsModal from '@/Components/PomodoroSettingsModal';
-import SocialProof from '@/Components/SocialProof';
 import TaskList from '@/Components/TaskList';
 import TimerIllustration from '@/Components/TimerIllustration';
 import VictoryInspireModal from '@/Components/VictoryInspireModal';
@@ -723,7 +722,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     </div>
                 </div>
 
-                {/* ── Goal progress strip ── */}
+                {/* Goal progress strip */}
                 {(() => {
                     const dailyGoal = goals.find((g) => g.period_type === 'daily') ?? null;
                     const monthlyGoals = goals.filter((g) => g.period_type === 'monthly');
@@ -790,12 +789,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     );
                 })()}
 
-                {/* ── Social proof strip ── */}
-                <div className="mt-3 w-full max-w-xs">
-                    <SocialProof compact />
-                </div>
-
-                {/* ── Points badge + Goals button ── */}
+                {/* Points badge + Goals button */}
                 <div className="mt-2 flex items-center gap-2">
                     {/* Points counter pill */}
                     <div className="flex items-center gap-1 rounded-full border border-ember/30 bg-ember/10 px-2.5 py-1">
@@ -822,7 +816,7 @@ export default function Dashboard({ pomodoroSettings, projects, categories, task
                     </button>
                 </div>
 
-                {/* ── Declare a past session ── */}
+                {/* Declare a past session */}
                 <button
                     type="button"
                     onClick={() => setDeclareOpen(true)}

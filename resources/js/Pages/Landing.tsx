@@ -4,7 +4,7 @@ import PlantAvatar from '@/Components/PlantAvatar';
 import { PageProps, User } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-// ── Feature card ────────────────────────────────────────────────────────────
+// Feature card
 function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
     return (
         <div className="rounded-2xl border border-boundary/60 bg-depth p-6 transition-colors hover:border-ember/30 hover:bg-depth/80">
@@ -17,7 +17,7 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: stri
     );
 }
 
-// ── Step ────────────────────────────────────────────────────────────────────
+// Step
 function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
     return (
         <div className="flex gap-4">
@@ -32,7 +32,7 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
     );
 }
 
-// ── Page ────────────────────────────────────────────────────────────────────
+// Page
 export default function Landing() {
     const { auth } = usePage<PageProps>().props;
     const user = auth.user as User | null;
@@ -46,7 +46,7 @@ export default function Landing() {
 
             <div className="flex min-h-screen flex-col bg-abyss">
 
-                {/* ── Navbar ──────────────────────────────────────────────── */}
+                {/* Navbar */}
                 <header className="sticky top-0 z-40 border-b border-boundary/30 bg-abyss/90 backdrop-blur-md">
                     <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
                         <div className="flex items-center gap-2.5 text-ember">
@@ -83,7 +83,7 @@ export default function Landing() {
 
                 <main className="flex-1">
 
-                    {/* ── Hero ────────────────────────────────────────────── */}
+                    {/* Hero */}
                     <section className="relative overflow-hidden px-6 pb-24 pt-20 text-center">
                         {/* Background glows */}
                         <div className="pointer-events-none absolute inset-0">
@@ -133,7 +133,7 @@ export default function Landing() {
                         </div>
                     </section>
 
-                    {/* ── Social proof strip ──────────────────────────────── */}
+                    {/* Social proof strip */}
                     <section className="border-y border-boundary/30 bg-depth/40 px-6 py-5">
                         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-center gap-6 sm:gap-10">
                             {[
@@ -150,7 +150,7 @@ export default function Landing() {
                         </div>
                     </section>
 
-                    {/* ── Features ────────────────────────────────────────── */}
+                    {/* Features */}
                     <section className="px-6 py-20">
                         <div className="mx-auto max-w-4xl">
                             <div className="mb-12 text-center">
@@ -199,7 +199,7 @@ export default function Landing() {
                         </div>
                     </section>
 
-                    {/* ── How it works ────────────────────────────────────── */}
+                    {/* How it works */}
                     <section className="border-y border-boundary/30 bg-depth/30 px-6 py-20">
                         <div className="mx-auto max-w-4xl">
                             <div className="mb-12 text-center">
@@ -227,7 +227,7 @@ export default function Landing() {
                         </div>
                     </section>
 
-                    {/* ── Levels showcase ──────────────────────────────────── */}
+                    {/* Levels showcase */}
                     <section className="px-6 py-20">
                         <div className="mx-auto max-w-4xl">
                             <div className="mb-4 text-center">
@@ -257,7 +257,7 @@ export default function Landing() {
                         </div>
                     </section>
 
-                    {/* ── Final CTA ───────────────────────────────────────── */}
+                    {/* Final CTA */}
                     <section className="px-6 pb-24">
                         <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-ember/20 bg-gradient-to-br from-ember/10 via-depth to-bloom/8 p-12 text-center shadow-2xl shadow-black/60">
                             {/* Glow */}

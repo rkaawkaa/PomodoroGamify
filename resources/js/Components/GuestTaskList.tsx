@@ -4,7 +4,7 @@ import { PageProps, Task } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useCallback, useRef, useState } from 'react';
 
-// ─── Toast variants ────────────────────────────────────────────────────────
+// Toast variants
 const TOAST_VARIANTS = [
     'animate-in fade-in slide-in-from-bottom-2 duration-300 bg-bloom/20 text-bloom',
     'animate-in zoom-in-90 fade-in duration-200 bg-ember/15 border border-ember/30 text-ember',
@@ -14,7 +14,7 @@ const TOAST_VARIANTS = [
 type ToastVariant = 0 | 1 | 2;
 interface ToastState { msg: string; variant: ToastVariant; key: number; }
 
-// ─── Celebration messages ──────────────────────────────────────────────────
+// Celebration messages
 const TOASTS: Record<string, Array<() => string>> = {
     fr: [
         () => `Bravo !`,
@@ -45,26 +45,26 @@ function pickToast(locale: string): { msg: string; variant: ToastVariant } {
     return { msg: fn(), variant };
 }
 
-// ─── Props ─────────────────────────────────────────────────────────────────
+// Props
 interface Props {
     isFocus: boolean;
 }
 
-// ─── Component ─────────────────────────────────────────────────────────────
+// Component
 export default function GuestTaskList({ isFocus }: Props) {
     const { t } = useTranslation();
     const { locale } = usePage<PageProps>().props;
 
-    // ── Tasks persisted in localStorage ──────────────────────────────────
+    // Tasks persisted in localStorage
     const [tasks, setTasks] = useLocalStorage<Task[]>('pomobloom_guest_tasks', []);
 
-    // ── Hidden ids (clear / individual hide — frontend-only) ─────────────
+    // Hidden ids (clear / individual hide — frontend-only)
     const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
 
-    // ── Done tasks visible toggle (hidden by default) ─────────────────────
+    // Done tasks visible toggle (hidden by default)
     const [showDone, setShowDone] = useState(false);
 
-    // ── UI state ─────────────────────────────────────────────────────────
+    // UI state
     const [activeId, setActiveId] = useState<number | null>(null);
     const [isAdding, setIsAdding]   = useState(false);
     const [addValue, setAddValue]   = useState('');
@@ -72,7 +72,7 @@ export default function GuestTaskList({ isFocus }: Props) {
     const [editValue, setEditValue] = useState('');
     const [flashId, setFlashId]     = useState<number | null>(null);
 
-    // ── Drag & drop state ────────────────────────────────────────────────
+    // Drag & drop state
     const [draggedId, setDraggedId]   = useState<number | null>(null);
     const [dragOverId, setDragOverId] = useState<number | null>(null);
 
@@ -91,7 +91,7 @@ export default function GuestTaskList({ isFocus }: Props) {
         setDragOverId(null);
     };
 
-    // ── Toast ─────────────────────────────────────────────────────────────
+    // Toast
     const [toast, setToast]     = useState<ToastState | null>(null);
     const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -101,7 +101,7 @@ export default function GuestTaskList({ isFocus }: Props) {
         toastTimer.current = setTimeout(() => setToast(null), 2800);
     }, []);
 
-    // ── Add ───────────────────────────────────────────────────────────────
+    // Add
     const handleAddSubmit = useCallback((e?: React.FormEvent) => {
         e?.preventDefault();
         const title = addValue.trim();
@@ -118,7 +118,7 @@ export default function GuestTaskList({ isFocus }: Props) {
         else { setIsAdding(false); setAddValue(''); }
     }, [addValue, handleAddSubmit]);
 
-    // ── Complete ──────────────────────────────────────────────────────────
+    // Complete
     const handleComplete = useCallback((id: number) => {
         setTasks((prev) =>
             prev.map((t) => t.id === id ? { ...t, status: 'done', completed_at: new Date().toISOString() } : t)
@@ -130,18 +130,18 @@ export default function GuestTaskList({ isFocus }: Props) {
         if (activeId === id) setActiveId(null);
     }, [activeId, locale, setTasks, showToast]);
 
-    // ── Delete ────────────────────────────────────────────────────────────
+    // Delete
     const handleDelete = useCallback((id: number) => {
         setTasks((prev) => prev.filter((t) => t.id !== id));
         if (activeId === id) setActiveId(null);
     }, [activeId, setTasks]);
 
-    // ── Hide ──────────────────────────────────────────────────────────────
+    // Hide
     const handleHide = useCallback((id: number) => {
         setHiddenIds((prev) => new Set([...prev, id]));
     }, []);
 
-    // ── Rename ────────────────────────────────────────────────────────────
+    // Rename
     const startEdit = useCallback((task: Task) => {
         setEditingId(task.id);
         setEditValue(task.title);
@@ -154,7 +154,7 @@ export default function GuestTaskList({ isFocus }: Props) {
         setTasks((list) => list.map((t) => t.id === id ? { ...t, title } : t));
     }, [editValue, setTasks]);
 
-    // ── Derived ───────────────────────────────────────────────────────────
+    // Derived
     const visibleTasks = tasks.filter((t) => !hiddenIds.has(t.id));
     const pending      = visibleTasks.filter((t) => t.status === 'pending');
     const allDone      = visibleTasks.filter((t) => t.status === 'done');
@@ -167,7 +167,7 @@ export default function GuestTaskList({ isFocus }: Props) {
     return (
         <div className="mb-4 rounded-2xl border border-boundary/60 bg-surface/30 px-3 py-3">
 
-            {/* ── Celebration toast ──────────────────────────────────────── */}
+            {/* Celebration toast */}
             <div className={`overflow-hidden transition-all duration-300 ${toast ? 'mb-2.5 max-h-10 opacity-100' : 'max-h-0 opacity-0'}`}>
                 {toast && (
                     <div key={toast.key} className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 ${TOAST_VARIANTS[toast.variant]}`}>
@@ -179,7 +179,7 @@ export default function GuestTaskList({ isFocus }: Props) {
                 )}
             </div>
 
-            {/* ── Header ─────────────────────────────────────────────────── */}
+            {/* Header */}
             <div className="mb-2 flex items-center justify-between">
                 <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${isFocus ? 'text-ember' : 'text-bloom'}`}>
                     {t('tasks.label')}
@@ -201,7 +201,7 @@ export default function GuestTaskList({ isFocus }: Props) {
                 </button>
             </div>
 
-            {/* ── Add input ──────────────────────────────────────────────── */}
+            {/* Add input */}
             {isAdding && (
                 <form onSubmit={handleAddSubmit} className="mb-2">
                     <input
@@ -216,7 +216,7 @@ export default function GuestTaskList({ isFocus }: Props) {
                 </form>
             )}
 
-            {/* ── Task list ──────────────────────────────────────────────── */}
+            {/* Task list */}
             <div className="max-h-36 space-y-0.5 overflow-y-auto">
                 {pending.map((task) => (
                     <GuestTaskRow
@@ -275,7 +275,7 @@ export default function GuestTaskList({ isFocus }: Props) {
                 )}
             </div>
 
-            {/* ── Footer ─────────────────────────────────────────────────── */}
+            {/* Footer */}
             {(allDone.length > 0 || pending.length > 0) && (
                 <div className="mt-2 flex items-center justify-between gap-2">
                     {allDone.length > 0 ? (
@@ -310,7 +310,7 @@ export default function GuestTaskList({ isFocus }: Props) {
     );
 }
 
-// ─── Task row (identical UI to TaskList's TaskRow) ─────────────────────────
+// Task row (identical UI to TaskList's TaskRow)
 interface RowProps {
     task: Task;
     isActive: boolean;

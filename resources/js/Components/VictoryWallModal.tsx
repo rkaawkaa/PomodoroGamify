@@ -8,7 +8,7 @@ import { usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
 import { PageProps } from '@/types';
 
-// ─── CSRF helper ─────────────────────────────────────────────────────────────
+// CSRF helper
 function getCsrf(): string {
     const raw = document.cookie
         .split('; ')
@@ -28,7 +28,7 @@ function timeAgo(dateStr: string, locale: string): string {
     return locale === 'fr' ? `il y a ${h}h` : `${h}h ago`;
 }
 
-// ─── Skeleton row ─────────────────────────────────────────────────────────────
+// Skeleton row
 function SkeletonRow() {
     return (
         <div className="animate-pulse space-y-2 rounded-2xl border border-boundary/30 bg-surface/30 p-4">
@@ -42,7 +42,7 @@ function SkeletonRow() {
     );
 }
 
-// ─── Message card ─────────────────────────────────────────────────────────────
+// Message card
 interface CardProps {
     msg: VictoryMessage;
     currentUserId: number;
@@ -104,7 +104,7 @@ function MessageCard({ msg, currentUserId, onLike, onDelete }: CardProps) {
     );
 }
 
-// ─── Main modal ───────────────────────────────────────────────────────────────
+// Main modal
 interface Props {
     onClose: () => void;
 }

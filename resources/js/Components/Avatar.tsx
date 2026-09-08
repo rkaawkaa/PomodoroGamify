@@ -16,7 +16,7 @@ function getTier(level: number): 1 | 2 | 3 | 4 | 5 {
     return Math.min(5, Math.ceil(level / 4)) as 1 | 2 | 3 | 4 | 5;
 }
 
-// ─── Warrior ────────────────────────────────────────────────────────────────
+// Warrior
 function WarriorT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -157,7 +157,7 @@ function WarriorT5({ s }: { s: number }) {
     );
 }
 
-// ─── Scientist ───────────────────────────────────────────────────────────────
+// Scientist
 function ScientistT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -312,7 +312,7 @@ function ScientistT5({ s }: { s: number }) {
     );
 }
 
-// ─── Medieval ────────────────────────────────────────────────────────────────
+// Medieval
 function MedievalT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -462,7 +462,7 @@ function MedievalT5({ s }: { s: number }) {
     );
 }
 
-// ─── Space ───────────────────────────────────────────────────────────────────
+// Space
 function SpaceT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -611,7 +611,7 @@ function SpaceT5({ s }: { s: number }) {
     );
 }
 
-// ─── Girly / Kawaii ──────────────────────────────────────────────────────────
+// Girly / Kawaii
 function GirlyT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -777,7 +777,7 @@ function GirlyT5({ s }: { s: number }) {
     );
 }
 
-// ─── Animals ─────────────────────────────────────────────────────────────────
+// Animals
 function AnimalsT1({ s }: { s: number }) {
     return (
         <svg viewBox="0 0 64 64" width={s} height={s} aria-hidden>
@@ -950,7 +950,7 @@ function AnimalsT5({ s }: { s: number }) {
     );
 }
 
-// ─── Dispatch ────────────────────────────────────────────────────────────────
+// Dispatch
 type Tier = 1 | 2 | 3 | 4 | 5;
 
 const THEME_COMPONENTS: Record<string, Record<Tier, React.FC<{ s: number }>>> = {

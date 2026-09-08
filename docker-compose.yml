@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: PomoBloom
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      APP_LOCALE: fr
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /data/database.sqlite
+      MAIL_MAILER: log            # aucun envoi réel : les e-mails vont dans les logs
+      SEED: "true"                # mettre "false" pour ne pas rejouer le seeder au démarrage
+    volumes:
+      - db-data:/data             # persiste la base entre les redémarrages
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') ? 0 : 1);"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  db-data:

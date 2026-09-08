@@ -3,7 +3,7 @@ import { PageProps, PointAward, Task } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// ─── CSRF ──────────────────────────────────────────────────────────────────
+// CSRF
 function getCsrf(): string {
     const raw = document.cookie
         .split('; ')
@@ -12,7 +12,7 @@ function getCsrf(): string {
     return decodeURIComponent(raw);
 }
 
-// ─── Toast variants ────────────────────────────────────────────────────────
+// Toast variants
 const TOAST_VARIANTS = [
     'animate-in fade-in slide-in-from-bottom-2 duration-300 bg-bloom/20 text-bloom',
     'animate-in zoom-in-90 fade-in duration-200 bg-ember/15 border border-ember/30 text-ember',
@@ -22,7 +22,7 @@ const TOAST_VARIANTS = [
 type ToastVariant = 0 | 1 | 2;
 interface ToastState { msg: string; variant: ToastVariant; key: number; }
 
-// ─── Celebration messages ──────────────────────────────────────────────────
+// Celebration messages
 const TOASTS: Record<string, Array<(n: string) => string>> = {
     fr: [
         (n) => `Bravo ${n} !`,
@@ -57,7 +57,7 @@ function pickToast(locale: string, name: string): { msg: string; variant: ToastV
     return { msg: fn(name), variant };
 }
 
-// ─── Props ─────────────────────────────────────────────────────────────────
+// Props
 interface Props {
     initialTasks: Task[];
     isFocus: boolean;
@@ -66,23 +66,23 @@ interface Props {
     onTaskAward?: (awards: PointAward[], userPoints: number) => void;
 }
 
-// ─── Component ─────────────────────────────────────────────────────────────
+// Component
 export default function TaskList({ initialTasks, isFocus, isSessionActive, onTaskCompleted, onTaskAward }: Props) {
     const { t } = useTranslation();
     const { auth, locale } = usePage<PageProps>().props;
     const username = auth.user.name;
 
-    // ── Task state ───────────────────────────────────────────────────────
+    // Task state
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     useEffect(() => { setTasks(initialTasks); }, [initialTasks]);
 
-    // ── Hidden ids (clear / individual hide — frontend-only) ─────────────
+    // Hidden ids (clear / individual hide — frontend-only)
     const [hiddenIds, setHiddenIds] = useState<Set<number>>(new Set());
 
-    // ── Done tasks visible toggle (hidden by default) ─────────────────────
+    // Done tasks visible toggle (hidden by default)
     const [showDone, setShowDone] = useState(false);
 
-    // ── UI state ─────────────────────────────────────────────────────────
+    // UI state
     const [activeId, setActiveId] = useState<number | null>(null);
     const [isAdding, setIsAdding]   = useState(false);
     const [addValue, setAddValue]   = useState('');
@@ -90,7 +90,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
     const [editValue, setEditValue] = useState('');
     const [flashId, setFlashId]     = useState<number | null>(null);
 
-    // ── Drag & drop state ────────────────────────────────────────────────
+    // Drag & drop state
     const [draggedId, setDraggedId]   = useState<number | null>(null);
     const [dragOverId, setDragOverId] = useState<number | null>(null);
 
@@ -109,7 +109,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         setDragOverId(null);
     };
 
-    // ── Toast ─────────────────────────────────────────────────────────────
+    // Toast
     const [toast, setToast]     = useState<ToastState | null>(null);
     const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -121,14 +121,14 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
 
     useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current); }, []);
 
-    // ── API helpers ──────────────────────────────────────────────────────
+    // API helpers
     const headers = {
         'Content-Type': 'application/json',
         'X-XSRF-TOKEN': getCsrf(),
         'Accept': 'application/json',
     };
 
-    // ── Add ───────────────────────────────────────────────────────────────
+    // Add
     const handleAddSubmit = useCallback(async (e?: React.FormEvent) => {
         e?.preventDefault();
         const title = addValue.trim();
@@ -155,7 +155,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         else { setIsAdding(false); setAddValue(''); }
     }, [addValue, handleAddSubmit]);
 
-    // ── Complete ──────────────────────────────────────────────────────────
+    // Complete
     const handleComplete = useCallback(async (id: number) => {
         setTasks((prev) =>
             prev.map((t) => t.id === id ? { ...t, status: 'done', completed_at: new Date().toISOString() } : t)
@@ -181,7 +181,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         }
     }, [isSessionActive, activeId, locale, username, onTaskCompleted, onTaskAward, showToast]);
 
-    // ── Delete ────────────────────────────────────────────────────────────
+    // Delete
     const handleDelete = useCallback(async (id: number) => {
         const removed = tasks.find((t) => t.id === id);
         setTasks((prev) => prev.filter((t) => t.id !== id));
@@ -194,12 +194,12 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         }
     }, [tasks, activeId]);
 
-    // ── Hide (frontend-only) ──────────────────────────────────────────────
+    // Hide (frontend-only)
     const handleHide = useCallback((id: number) => {
         setHiddenIds((prev) => new Set([...prev, id]));
     }, []);
 
-    // ── Rename ────────────────────────────────────────────────────────────
+    // Rename
     const startEdit = useCallback((task: Task) => {
         setEditingId(task.id);
         setEditValue(task.title);
@@ -220,7 +220,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
         }
     }, [editValue, tasks]);
 
-    // ── Derived ───────────────────────────────────────────────────────────
+    // Derived
     const visibleTasks = tasks.filter((t) => !hiddenIds.has(t.id));
     const pending      = visibleTasks.filter((t) => t.status === 'pending');
     const allDone      = visibleTasks.filter((t) => t.status === 'done');
@@ -233,7 +233,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
     return (
         <div className="mb-4 rounded-2xl border border-boundary/60 bg-surface/30 px-3 py-3">
 
-            {/* ── Celebration toast ──────────────────────────────────────── */}
+            {/* Celebration toast */}
             <div className={`overflow-hidden transition-all duration-300 ${toast ? 'mb-2.5 max-h-10 opacity-100' : 'max-h-0 opacity-0'}`}>
                 {toast && (
                     <div key={toast.key} className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 ${TOAST_VARIANTS[toast.variant]}`}>
@@ -245,7 +245,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                 )}
             </div>
 
-            {/* ── Header ─────────────────────────────────────────────────── */}
+            {/* Header */}
             <div className="mb-2 flex items-center justify-between">
                 <span className={`text-[11px] font-bold uppercase tracking-[0.18em] ${isFocus ? 'text-ember' : 'text-bloom'}`}>
                     {t('tasks.label')}
@@ -267,7 +267,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                 </button>
             </div>
 
-            {/* ── Add input ──────────────────────────────────────────────── */}
+            {/* Add input */}
             {isAdding && (
                 <form onSubmit={handleAddSubmit} className="mb-2">
                     <input
@@ -282,7 +282,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                 </form>
             )}
 
-            {/* ── Task list ──────────────────────────────────────────────── */}
+            {/* Task list */}
             <div className="max-h-52 space-y-0.5 overflow-y-auto">
 
                 {/* Pending tasks (draggable) */}
@@ -345,7 +345,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
                 )}
             </div>
 
-            {/* ── Footer ─────────────────────────────────────────────────── */}
+            {/* Footer */}
             {(allDone.length > 0 || pending.length > 0) && (
                 <div className="mt-2 flex items-center justify-between gap-2">
                     {/* Done tasks toggle */}
@@ -384,7 +384,7 @@ export default function TaskList({ initialTasks, isFocus, isSessionActive, onTas
     );
 }
 
-// ─── Task row ──────────────────────────────────────────────────────────────
+// Task row
 interface RowProps {
     task: Task;
     isActive: boolean;

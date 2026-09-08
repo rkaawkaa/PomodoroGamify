@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    /* ─── Palette Nightbloom ─────────────────────────────────────────────────
+    /* Palette Nightbloom
      *
      * Structure (du plus sombre au plus clair)
      *   void      → le néant, fond le plus profond
@@ -23,8 +23,7 @@
      *   aurora    → badges / achievements — violet doux
      *   bloom     → streak / succès — vert vitalité
      *   coral     → alertes / avertissements — orange doux
-     *
-     * ──────────────────────────────────────────────────────────────────────── */
+     */
 
     --void:       240 28% 6%;
     --abyss:      237 22% 20%;
@@ -42,7 +41,7 @@
     --bloom:      142 45% 52%;
     --coral:      16 78% 63%;
 
-    /* ─── Tokens shadcn/ui (mappés sur la palette) ──────────────────────── */
+    /* Tokens shadcn/ui (mappés sur la palette) */
 
     --background:           var(--abyss);
     --foreground:           var(--moonbeam);
@@ -82,7 +81,7 @@
     --radius: 0.75rem;
   }
 
-  /* ─── Light mode ─────────────────────────────────────────────────────────── */
+  /* Light mode */
   [data-color-mode="light"] {
     --void:       220 20% 88%;
     --abyss:      220 25% 97%;

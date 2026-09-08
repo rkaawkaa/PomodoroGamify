@@ -2,7 +2,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 import { PointAward } from '@/types';
 import { useEffect, useState } from 'react';
 
-// ─── Event display metadata ────────────────────────────────────────────────
+// Event display metadata
 
 interface EventDisplay {
     emoji: string;
@@ -41,7 +41,7 @@ function useEventDisplay(award: PointAward): EventDisplay {
     return { emoji: '✨', label, accent: 'text-whisper', isMilestone: false };
 }
 
-// ─── Individual award chip ─────────────────────────────────────────────────
+// Individual award chip
 
 function AwardChip({ award, delay }: { award: PointAward; delay: number }) {
     const display = useEventDisplay(award);
@@ -61,7 +61,7 @@ function AwardChip({ award, delay }: { award: PointAward; delay: number }) {
     );
 }
 
-// ─── Animated counter ──────────────────────────────────────────────────────
+// Animated counter
 
 function AnimatedCounter({ target }: { target: number }) {
     const [value, setValue] = useState(0);
@@ -81,7 +81,7 @@ function AnimatedCounter({ target }: { target: number }) {
     return <>{value.toLocaleString()}</>;
 }
 
-// ─── Main component ────────────────────────────────────────────────────────
+// Main component
 
 interface Props {
     awards: PointAward[];

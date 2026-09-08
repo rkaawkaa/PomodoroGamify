@@ -1,9 +1,9 @@
-// ─── Theme definitions ──────────────────────────────────────────────────────
+// Theme definitions
 // Each theme provides: color overrides (HSL bare values for CSS vars),
 // level titles in FR + EN, and an icon emoji.
 
 export interface ThemeColors {
-    ember: string;   // HSL bare values e.g. "4 68% 58%"
+    ember: string; // HSL bare values e.g. "4 68% 58%"
     bloom: string;
     coral: string;
     aurora: string;
@@ -24,9 +24,9 @@ export const THEMES: Theme[] = [
         icon: '🌱',
         name: { fr: 'Botanique', en: 'Botanic' },
         colors: {
-            ember:  '130 52% 46%',
-            bloom:  '160 55% 52%',
-            coral:  '90 48% 50%',
+            ember: '130 52% 46%',
+            bloom: '160 55% 52%',
+            coral: '90 48% 50%',
             aurora: '195 50% 58%',
         },
         titles: {
@@ -39,9 +39,9 @@ export const THEMES: Theme[] = [
         icon: '⚔️',
         name: { fr: 'Conquête', en: 'Conquest' },
         colors: {
-            ember:  '0 72% 52%',
-            bloom:  '45 88% 55%',
-            coral:  '15 78% 58%',
+            ember: '0 72% 52%',
+            bloom: '45 88% 55%',
+            coral: '15 78% 58%',
             aurora: '280 50% 62%',
         },
         titles: {
@@ -54,9 +54,9 @@ export const THEMES: Theme[] = [
         icon: '🔬',
         name: { fr: 'Intelligence', en: 'Intelligence' },
         colors: {
-            ember:  '210 82% 62%',
-            bloom:  '180 68% 50%',
-            coral:  '195 65% 56%',
+            ember: '210 82% 62%',
+            bloom: '180 68% 50%',
+            coral: '195 65% 56%',
             aurora: '230 62% 66%',
         },
         titles: {
@@ -69,9 +69,9 @@ export const THEMES: Theme[] = [
         icon: '🏰',
         name: { fr: 'Médiéval', en: 'Medieval' },
         colors: {
-            ember:  '30 62% 48%',
-            bloom:  '345 55% 50%',
-            coral:  '35 52% 48%',
+            ember: '30 62% 48%',
+            bloom: '345 55% 50%',
+            coral: '35 52% 48%',
             aurora: '268 45% 58%',
         },
         titles: {
@@ -84,9 +84,9 @@ export const THEMES: Theme[] = [
         icon: '🚀',
         name: { fr: 'Spatiale', en: 'Space' },
         colors: {
-            ember:  '270 72% 65%',
-            bloom:  '195 80% 58%',
-            coral:  '288 60% 62%',
+            ember: '270 72% 65%',
+            bloom: '195 80% 58%',
+            coral: '288 60% 62%',
             aurora: '340 65% 65%',
         },
         titles: {
@@ -99,9 +99,9 @@ export const THEMES: Theme[] = [
         icon: '🦄',
         name: { fr: 'Kawaii', en: 'Kawaii' },
         colors: {
-            ember:  '340 78% 65%',
-            bloom:  '280 52% 68%',
-            coral:  '15 70% 68%',
+            ember: '340 78% 65%',
+            bloom: '280 52% 68%',
+            coral: '15 70% 68%',
             aurora: '312 62% 62%',
         },
         titles: {
@@ -114,9 +114,9 @@ export const THEMES: Theme[] = [
         icon: '🦊',
         name: { fr: 'Animaux', en: 'Animals' },
         colors: {
-            ember:  '28 80% 58%',
-            bloom:  '155 48% 52%',
-            coral:  '20 68% 60%',
+            ember: '28 80% 58%',
+            bloom: '155 48% 52%',
+            coral: '20 68% 60%',
             aurora: '40 62% 55%',
         },
         titles: {
@@ -129,10 +129,10 @@ export const THEMES: Theme[] = [
         icon: '💎',
         name: { fr: 'Prestige', en: 'Prestige' },
         colors: {
-            ember:  '43 82% 52%',   // or chaud / deep gold
-            bloom:  '158 46% 46%',  // émeraude
-            coral:  '25 58% 52%',   // cognac / bronze
-            aurora: '46 62% 70%',   // champagne / platine
+            ember: '43 82% 52%', // or chaud / deep gold
+            bloom: '158 46% 46%', // émeraude
+            coral: '25 58% 52%', // cognac / bronze
+            aurora: '46 62% 70%', // champagne / platine
         },
         titles: {
             fr: ['Aspirant','Analyste','Consultant','Chef de Projet','Manager','Senior Manager','Directeur','Directeur Senior','Vice-Président','SVP','EVP','C-Suite','PDG','Président','Partner Élite','Fondateur','Magnat','Titan','Oligarque','Légende des Affaires'],
