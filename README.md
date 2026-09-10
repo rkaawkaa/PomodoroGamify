@@ -47,9 +47,10 @@ système de points) est disponible dans [`DOCUMENTATION.md`](DOCUMENTATION.md).
 
 ## Démarrage avec Docker (recommandé)
 
-Seul **Docker** (Docker Desktop) est requis. Une seule commande construit
-l'application, démarre la base, applique les migrations et charge des données de
-démonstration :
+Seul **Docker** est requis : Docker Desktop **4.x ou plus récent** (ou, sous
+Linux, Docker Engine **20.10+** avec le plugin `docker compose` v2). Une seule
+commande construit l'application, démarre la base, applique les migrations et
+charge des données de démonstration :
 
 ```bash
 docker compose up --build
