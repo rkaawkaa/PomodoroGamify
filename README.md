@@ -1,5 +1,14 @@
 # PomoBloom
 
+Projet réalisé par **KAWKA Robin** dans le cadre du **diplôme d'ingénieur du
+CNAM**, spécialité Informatique, parcours *Architecture et ingénierie des
+systèmes et logiciels (AISL)*.
+
+**UE GLG204 — Architectures logicielles Java (2)**
+Responsable de l'UE : Serge ROSMORDUC · Suivi : Pierre COURTIER
+
+---
+
 Application web de minuteur Pomodoro avec suivi de l'activité et système de
 progression. Réalisée avec Laravel 12, Inertia.js et React (TypeScript).
 
@@ -31,7 +40,7 @@ système de points) est disponible dans [`DOCUMENTATION.md`](DOCUMENTATION.md).
 | Front | React 18 + TypeScript, via Inertia.js v2 |
 | Build | Vite |
 | CSS | Tailwind CSS |
-| Base de données | MySQL 8 (Docker & prod) / SQLite (install manuelle) |
+| Base de données | MySQL 8 |
 | Auth | Laravel Breeze |
 | E-mails | Resend (prod) / Mailpit (Docker) |
 | Tests | Pest |
@@ -52,7 +61,7 @@ accessible :
 | Service | URL | Identifiants |
 |---------|-----|-------------|
 | **Application** | http://localhost:8000 | `marc@example.com` / `password` |
-| **Espace admin** | http://localhost:8000/admin/login | `admin@test.fr` / `password` |
+| **Espace admin** | http://localhost:8000/admin/login | `admin@example.com` / `password` |
 | **phpMyAdmin** (base de données) | http://localhost:8081 | `pomobloom` / `pomobloom` (ou `root` / `root`) |
 | **Mailpit** (e-mails envoyés par l'app) | http://localhost:8025 | — |
 
@@ -93,13 +102,11 @@ nombre du mapping `ports` correspondant dans `docker-compose.yml`.
 Prérequis sur la machine :
 
 - **PHP 8.3+** avec les extensions habituelles de Laravel
-  (`pdo_mysql` ou `pdo_sqlite`, `mbstring`, `openssl`, `tokenizer`, `xml`,
-  `ctype`, `curl`, `fileinfo`, `bcmath`) — distribution type Laragon, XAMPP,
-  Herd ou PHP système
+  (`pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`,
+  `fileinfo`, `bcmath`) — distribution type Laragon, XAMPP, Herd ou PHP système
 - **Composer 2**
 - **Node.js 20+** et **npm**
-- **MySQL** (ou utiliser SQLite : mettre `DB_CONNECTION=sqlite` dans `.env` et
-  `touch database/database.sqlite`). Pas de serveur mail requis.
+- **MySQL 8** avec une base et un utilisateur dédiés. Pas de serveur mail requis.
 
 ```bash
 composer install
@@ -143,7 +150,7 @@ php artisan migrate:fresh --seed     # tout réinitialiser puis recharger
 | Type | URL | E-mail | Mot de passe |
 |------|-----|--------|--------------|
 | Utilisateur de démo | `/login` | `marc@example.com` | `password` |
-| Administration | `/admin/login` | `admin@test.fr` | `password` |
+| Administration | `/admin/login` | `admin@example.com` | `password` |
 
 Le panneau `/admin` est **indépendant** du système de comptes utilisateurs
 (pas de `User` admin, juste un identifiant/mot de passe). Il affiche le nombre
@@ -165,8 +172,8 @@ php artisan db                        # shell SQL interactif
 php artisan tinker                    # console Eloquent
 ```
 
-**Install manuelle en SQLite** : ouvrir `database/database.sqlite` avec
-**DB Browser for SQLite**, **TablePlus**, ou l'extension VS Code *SQLite Viewer*.
+**En dehors de phpMyAdmin** : n'importe quel client MySQL (TablePlus, DBeaver,
+DataGrip, `mysql` en ligne de commande) sur la base `pomobloom`.
 
 ## Commandes utiles
 
@@ -188,7 +195,3 @@ lang/           Fichiers de traduction
 routes/         web.php, auth.php, console.php
 docker/         Dockerfile + entrypoint.sh (image locale ; la prod utilise nixpacks.toml)
 ```
-
-## Licence
-
-MIT

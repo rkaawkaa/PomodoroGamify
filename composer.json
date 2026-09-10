@@ -1,13 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "kawka/pomobloom",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "PomoBloom — minuteur Pomodoro gamifié (CNAM, UE GLG204).",
     "keywords": [
+        "pomodoro",
         "laravel",
-        "framework"
+        "inertia"
     ],
-    "license": "MIT",
+    "license": "proprietary",
     "require": {
         "php": "^8.3",
         "inertiajs/inertia-laravel": "^2.0",

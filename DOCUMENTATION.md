@@ -1,5 +1,9 @@
 # PomoBloom — Documentation technique
 
+Projet de **KAWKA Robin** — diplôme d'ingénieur CNAM, parcours AISL,
+UE **GLG204 — Architectures logicielles Java (2)**
+(responsable : Serge ROSMORDUC ; suivi : Pierre COURTIER).
+
 Application web de minuteur Pomodoro gamifié : minuteur focus/pause, gain de
 points, montée de niveaux (avatar évolutif), suivi de projets/catégories,
 statistiques, objectifs, mur de victoires communautaire et récapitulatifs par
@@ -20,7 +24,7 @@ e-mail.
 | Animations | Framer Motion |
 | Icônes | lucide-react |
 | Authentification | Laravel Breeze (scaffold Inertia/React) + Sanctum |
-| Base de données | SQLite en développement, MySQL en production |
+| Base de données | MySQL 8 (SQLite en mémoire uniquement pour la suite de tests) |
 | E-mails | Resend (`resend/resend-laravel`) |
 | Génération de routes JS | Ziggy (`tightenco/ziggy`) |
 | Tests | Pest 4 (surcouche PHPUnit) |
@@ -195,7 +199,7 @@ php artisan db:seed           # jeu de données de démo (voir §5.5)
 composer run dev              # lance en parallèle : serveur PHP, worker de file, logs, Vite
 ```
 
-L'application est ensuite accessible sur `http://localhost:8000`. Compte de test
+L'application est ensuite accessible sur `http://localhost:8000`. Compte de démo
 après seed : `marc@example.com` / `password`.
 
 ### 4.3 Variables d'environnement principales
@@ -205,7 +209,7 @@ après seed : `marc@example.com` / `password`.
 | `APP_NAME` | Nom affiché de l'application (défaut : PomoBloom) |
 | `APP_URL` | URL complète de l'application |
 | `APP_ENV` / `APP_DEBUG` | Environnement et mode debug |
-| `DB_CONNECTION` | `sqlite` (dev) ou `mysql` (prod) + `DB_*` associées |
+| `DB_CONNECTION` | `mysql` + `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` |
 | `MAIL_MAILER` / `RESEND_API_KEY` | Envoi d'e-mails via Resend |
 | `MAIL_FROM_ADDRESS` | Adresse expéditrice |
 | `MAIL_SUPPORT` | Adresse de support affichée dans l'interface |
@@ -225,10 +229,10 @@ après seed : `marc@example.com` / `password`.
 
 ## 5. Base de données
 
-Connexion par défaut : **SQLite** (`database/database.sqlite`, non versionné).
-En production : MySQL. Toutes les tables métier utilisent des clés étrangères
-avec suppression en cascade (`cascadeOnDelete`) ou mise à `NULL`
-(`nullOnDelete`) selon le cas.
+Base : **MySQL 8** (conteneur `db` en Docker, plugin managé en production). La
+suite de tests Pest utilise une base **SQLite en mémoire** (`phpunit.xml`).
+Toutes les tables métier utilisent des clés étrangères avec suppression en
+cascade (`cascadeOnDelete`) ou mise à `NULL` (`nullOnDelete`) selon le cas.
 
 ### 5.1 Tables techniques (scaffold Laravel)
 
@@ -782,8 +786,8 @@ docker compose up --build      # app :8000 · phpMyAdmin :8081 · Mailpit :8025
 docker compose down -v         # arrêt + suppression de la base
 ```
 
-Comptes : `marc@example.com` / `password` (app), `admin@test.fr` / `password`
-(`/admin/login`). Le workflow local sans Docker (§4, SQLite) reste inchangé.
+Comptes : `marc@example.com` / `password` (app), `admin@example.com` / `password`
+(`/admin/login`). Le workflow local sans Docker (§4) reste inchangé.
 
 ### 19.2 Déploiement PaaS
 

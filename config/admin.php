@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'email'    => env('ADMIN_EMAIL', 'admin@test.fr'),
+    'email'    => env('ADMIN_EMAIL', 'admin@example.com'),
     'password' => env('ADMIN_PASSWORD', 'password'),
 
 ];
