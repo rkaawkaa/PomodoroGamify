@@ -31,39 +31,75 @@ système de points) est disponible dans [`DOCUMENTATION.md`](DOCUMENTATION.md).
 | Front | React 18 + TypeScript, via Inertia.js v2 |
 | Build | Vite |
 | CSS | Tailwind CSS |
-| Base de données | SQLite (dev) / MySQL (prod) |
+| Base de données | MySQL 8 (Docker & prod) / SQLite (install manuelle) |
 | Auth | Laravel Breeze |
-| E-mails | Resend |
+| E-mails | Resend (prod) / Mailpit (Docker) |
 | Tests | Pest |
 
-## Démarrage rapide avec Docker
+## Démarrage avec Docker (recommandé)
 
-C'est la voie la plus simple : seul **Docker** est requis. L'image build le
-front, applique les migrations et joue le seeder automatiquement au démarrage.
+Seul **Docker** (Docker Desktop) est requis. Une seule commande construit
+l'application, démarre la base, applique les migrations et charge des données de
+démonstration :
 
 ```bash
 docker compose up --build
 ```
 
-Puis ouvrir **http://localhost:8000** et se connecter avec
-`marc@example.com` / `password`.
+Laisse ~30–40 s le temps que MySQL démarre au premier lancement. Ensuite tout est
+accessible :
 
-- Un seul conteneur, base **SQLite** persistée dans un volume Docker (`db-data`).
-- E-mails écrits dans les logs (`MAIL_MAILER=log`), aucune clé d'API requise.
-- `SEED: "false"` dans `docker-compose.yml` pour ne plus rejouer le seeder à
-  chaque redémarrage ; `docker compose down -v` supprime aussi la base.
+| Service | URL | Identifiants |
+|---------|-----|-------------|
+| **Application** | http://localhost:8000 | `marc@example.com` / `password` |
+| **Espace admin** | http://localhost:8000/admin/login | `admin@test.fr` / `password` |
+| **phpMyAdmin** (base de données) | http://localhost:8081 | `pomobloom` / `pomobloom` (ou `root` / `root`) |
+| **Mailpit** (e-mails envoyés par l'app) | http://localhost:8025 | — |
+
+Autres comptes de démo (onboarding déjà fait, même mot de passe `password`) :
+`claire@example.com`, `sofiane@example.com`, `emma@example.com`,
+`lucas@example.com`, `nadia@example.com`.
+
+### Ce que lance `docker compose up`
+
+| Conteneur | Rôle |
+|-----------|------|
+| `app` | Laravel + front compilé, servi sur le port 8000 |
+| `db` | MySQL 8 — données persistées dans le volume Docker `db-data` |
+| `phpmyadmin` | interface web de la base |
+| `mailpit` | serveur SMTP factice : capture **tous** les e-mails, rien n'est réellement envoyé |
+
+Au premier démarrage, le conteneur `app` attend MySQL puis exécute
+`php artisan migrate` et `php artisan db:seed` (voir
+[Données de démonstration](#données-de-démonstration)).
+
+### Commandes Docker utiles
+
+```bash
+docker compose up -d --build                              # démarrer en arrière-plan
+docker compose logs -f app                                # suivre les logs de l'app
+docker compose exec app php artisan migrate:fresh --seed  # réinitialiser les données de démo
+docker compose down                                       # arrêter
+docker compose down -v                                    # arrêter + supprimer la base
+```
+
+Pour ne **pas** recharger les données de démo à chaque redémarrage, passe
+`SEED: "false"` dans `docker-compose.yml`.
+Si un port est déjà pris sur ta machine (8000 / 8081 / 8025), change le premier
+nombre du mapping `ports` correspondant dans `docker-compose.yml`.
 
 ## Installation manuelle (sans Docker)
 
 Prérequis sur la machine :
 
 - **PHP 8.3+** avec les extensions habituelles de Laravel
-  (`pdo_sqlite`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `curl`,
-  `fileinfo`, `bcmath`) — distribution type Laragon, XAMPP, Herd ou PHP système
+  (`pdo_mysql` ou `pdo_sqlite`, `mbstring`, `openssl`, `tokenizer`, `xml`,
+  `ctype`, `curl`, `fileinfo`, `bcmath`) — distribution type Laragon, XAMPP,
+  Herd ou PHP système
 - **Composer 2**
 - **Node.js 20+** et **npm**
-- Aucun serveur de base de données (SQLite = simple fichier) ni serveur mail
-  (driver `log` par défaut)
+- **MySQL** (ou utiliser SQLite : mettre `DB_CONNECTION=sqlite` dans `.env` et
+  `touch database/database.sqlite`). Pas de serveur mail requis.
 
 ```bash
 composer install
@@ -72,65 +108,65 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-php artisan migrate        # crée database/database.sqlite + les tables
-php artisan db:seed        # jeu de données de démo (voir plus bas)
+# renseigner DB_* dans .env, puis :
+php artisan migrate        # crée les tables
+php artisan db:seed        # jeu de données de démo (voir ci-dessous)
 
 composer run dev           # serveur PHP + worker + logs + Vite, sur :8000
 ```
 
 Pour lancer les services séparément : `php artisan serve` et `npm run dev`.
+En dev manuel, mettre `MAIL_MAILER=log` dans `.env` pour écrire les e-mails dans
+`storage/logs/laravel.log` au lieu de les envoyer.
 
-## Données de démonstration et compte de test
+## Données de démonstration
 
-Le seeder `DemoSeeder` crée **6 comptes** (mot de passe commun : `password`),
-chacun avec des projets, des catégories récemment créées, des tâches (en cours et
-terminées), un historique de sessions Pomodoro réparti sur le dernier mois, des
-objectifs, des messages de victoire et l'historique de points correspondant.
+Le seeder `DemoSeeder` (`database/seeders/DemoSeeder.php`) crée **6 comptes**
+(mot de passe commun : `password`), chacun avec des projets, des catégories
+récemment créées, des tâches (en cours et terminées), un historique de sessions
+Pomodoro réparti sur le dernier mois, des objectifs, des messages de victoire et
+l'historique de points correspondant. Le jeu de données est **reproductible**
+(graine fixe) et le seeder est **rejouable** (il purge d'abord ces 6 comptes).
+
+| Compte | Particularité |
+|--------|---------------|
+| `marc@example.com` | compte principal, gros historique, **onboarding non fait** (le carrousel s'affiche à la connexion) |
+| `claire@` `sofiane@` `emma@` `lucas@` `nadia@` `example.com` | volumes d'activité variés, onboarding fait |
 
 ```bash
-# Peupler la base
-php artisan db:seed
-
-# Ou tout remettre à zéro puis peupler
-php artisan migrate:fresh --seed
+php artisan db:seed                  # (re)charger les données de démo
+php artisan migrate:fresh --seed     # tout réinitialiser puis recharger
 ```
 
-Se connecter ensuite sur http://localhost:8000/login avec :
+## Comptes
 
-| E-mail | Mot de passe | Note |
-|--------|--------------|------|
-| `marc@example.com` | `password` | compte principal, gros historique, **onboarding non fait** (le carrousel s'affiche à la connexion) |
+| Type | URL | E-mail | Mot de passe |
+|------|-----|--------|--------------|
+| Utilisateur de démo | `/login` | `marc@example.com` | `password` |
+| Administration | `/admin/login` | `admin@test.fr` | `password` |
 
-Autres comptes (onboarding déjà fait, même mot de passe) : `claire@example.com`,
-`sofiane@example.com`, `emma@example.com`, `lucas@example.com`, `nadia@example.com`.
+Le panneau `/admin` est **indépendant** du système de comptes utilisateurs
+(pas de `User` admin, juste un identifiant/mot de passe). Il affiche le nombre
+d'utilisateurs, de sessions Pomodoro et de sessions HTTP actives, plus la liste
+des utilisateurs triés par nombre de pomodoros. Identifiants surchargeables via
+`ADMIN_EMAIL` / `ADMIN_PASSWORD` dans `.env`.
 
 ## Inspecter la base de données
 
-Fichier SQLite : `database/database.sqlite` (installation manuelle) ou volume
-Docker `db-data` (`/data/database.sqlite` dans le conteneur).
+**Avec Docker** : ouvrir **phpMyAdmin → http://localhost:8081**
+(`pomobloom` / `pomobloom`). Base `pomobloom`.
 
-Sans rien installer, via Artisan :
+**En ligne de commande** (Docker : préfixer par `docker compose exec app`) :
 
 ```bash
 php artisan db:show                   # liste des tables + nombre de lignes
 php artisan db:table users            # colonnes, index et clés d'une table
-php artisan db:table pomodoro_sessions
-php artisan db                        # ouvre un shell SQL interactif
-php artisan tinker                    # console : \App\Models\User::with('projects')->get()
+php artisan db                        # shell SQL interactif
+php artisan tinker                    # console Eloquent
 ```
 
-En Docker, préfixer par `docker compose exec app` :
-
-```bash
-docker compose exec app php artisan db:show
-docker compose exec app php artisan db:table users
-# ou extraire le fichier pour l'ouvrir dans un logiciel :
-docker compose cp app:/data/database.sqlite ./database-docker.sqlite
-```
-
-Avec une interface graphique, ouvrir le fichier `.sqlite` avec **DB Browser for
-SQLite** (gratuit), **TablePlus**, l'extension VS Code *SQLite Viewer*, ou l'outil
-base de données de PhpStorm / DataGrip.
+**Install manuelle en SQLite** : ouvrir `database/database.sqlite` avec
+**DB Browser for SQLite**, **TablePlus**, ou l'extension VS Code *SQLite Viewer*.
 
 ## Commandes utiles
 

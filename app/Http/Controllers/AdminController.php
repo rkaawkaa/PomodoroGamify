@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
-    private const ADMIN_EMAIL    = 'rkawka@orange.fr';
-    private const ADMIN_PASSWORD = 'Rpgange11!';
-    private const SESSION_KEY    = 'admin_auth';
+    private const SESSION_KEY = 'admin_auth';
 
     // Login form
 
@@ -31,7 +29,7 @@ class AdminController extends Controller
         $email    = $request->input('email');
         $password = $request->input('password');
 
-        if ($email === self::ADMIN_EMAIL && $password === self::ADMIN_PASSWORD) {
+        if ($email === config('admin.email') && $password === config('admin.password')) {
             $request->session()->put(self::SESSION_KEY, true);
             return redirect()->route('admin.dashboard');
         }

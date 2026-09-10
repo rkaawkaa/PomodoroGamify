@@ -15,10 +15,10 @@ RUN npm run build
 # ---------------------------------------------------------------------------
 FROM php:8.3-cli-bookworm AS app
 
-# Extensions PHP nécessaires (SQLite, bcmath, zip pour Composer)
+# Extensions PHP nécessaires (MySQL + SQLite, bcmath, zip pour Composer)
 RUN apt-get update \
  && apt-get install -y --no-install-recommends libzip-dev libsqlite3-dev unzip git \
- && docker-php-ext-install -j"$(nproc)" pdo_sqlite bcmath zip \
+ && docker-php-ext-install -j"$(nproc)" pdo_mysql pdo_sqlite bcmath zip \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

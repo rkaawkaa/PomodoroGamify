@@ -19,23 +19,40 @@ set_env() {
     fi
 }
 
-DB_FILE="${DB_DATABASE:-/var/www/html/database/database.sqlite}"
-
 set_env APP_NAME       "${APP_NAME}"
 set_env APP_ENV        "${APP_ENV}"
 set_env APP_DEBUG      "${APP_DEBUG}"
 set_env APP_URL        "${APP_URL}"
 set_env APP_LOCALE     "${APP_LOCALE}"
-set_env DB_CONNECTION  "sqlite"
-set_env DB_DATABASE    "${DB_FILE}"
+set_env DB_CONNECTION  "${DB_CONNECTION}"
+set_env DB_HOST        "${DB_HOST}"
+set_env DB_PORT        "${DB_PORT}"
+set_env DB_DATABASE    "${DB_DATABASE}"
+set_env DB_USERNAME    "${DB_USERNAME}"
+set_env DB_PASSWORD    "${DB_PASSWORD}"
 set_env MAIL_MAILER    "${MAIL_MAILER}"
+set_env MAIL_HOST      "${MAIL_HOST}"
+set_env MAIL_PORT      "${MAIL_PORT}"
 
 # 2. Clé d'application
 php artisan key:generate --force --no-interaction
 
-# 3. Fichier SQLite
-mkdir -p "$(dirname "$DB_FILE")"
-[ -f "$DB_FILE" ] || touch "$DB_FILE"
+# 3. Attendre que MySQL réponde (double sécurité en plus du depends_on)
+if [ "${DB_CONNECTION}" = "mysql" ]; then
+    echo "En attente de la base de données..."
+    i=0
+    until php -r '
+        try {
+            new PDO("mysql:host=".getenv("DB_HOST").";port=".getenv("DB_PORT"), getenv("DB_USERNAME"), getenv("DB_PASSWORD"));
+        } catch (Throwable $e) { exit(1); }
+        exit(0);
+    ' 2>/dev/null; do
+        i=$((i + 1))
+        [ "$i" -ge 60 ] && echo "Base de données injoignable, on abandonne." && exit 1
+        sleep 2
+    done
+    echo "Base de données prête."
+fi
 
 # 4. Permissions d'écriture
 chmod -R ug+rw storage bootstrap/cache 2>/dev/null || true

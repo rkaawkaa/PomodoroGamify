@@ -752,30 +752,38 @@ Lancement : `composer run test` ou `php artisan test`.
 
 ### 19.1 Image Docker locale
 
-L'image Docker sert **uniquement au poste local**. La production continue
+Le stack Docker sert **uniquement au poste local**. La production continue
 d'utiliser `nixpacks.toml` (voir §19.2) ; pour éviter toute détection
 automatique du builder par l'hébergeur, le `Dockerfile` est rangé dans `docker/`
 et non à la racine.
 
+**4 services** (`docker-compose.yml`) :
+
+| Service | Image | Port | Rôle |
+|---------|-------|------|------|
+| `app` | build `docker/Dockerfile` | 8000 | Laravel + front compilé |
+| `db` | `mysql:8.0` | — | base `pomobloom` (user/pass `pomobloom`), volume `db-data` |
+| `phpmyadmin` | `phpmyadmin:5.2` | 8081 | interface web de la base |
+| `mailpit` | `axllent/mailpit` | 8025 | capture de tous les e-mails (SMTP interne `mailpit:1025`) |
+
 - **`docker/Dockerfile`** — build multi-étapes :
   1. `node:20` compile les assets front (`npm ci && npm run build`),
-  2. `php:8.3-cli` installe les extensions (`pdo_sqlite`, `bcmath`, `zip`),
-     Composer, le code et les assets compilés, puis
-     `composer install --no-dev`.
-- **`docker/entrypoint.sh`** — au démarrage du conteneur : crée `.env` +
-  `APP_KEY`, reporte les variables de `docker-compose.yml` dans `.env`, crée le
-  fichier SQLite, lance `php artisan migrate --force` puis `php artisan db:seed`
-  (désactivable avec `SEED=false`), et démarre `php artisan serve` sur `0.0.0.0:8000`.
-- **`docker-compose.yml`** — un service `app` (port 8000, `dockerfile:
-  docker/Dockerfile`), base SQLite dans le volume `db-data`
-  (`DB_DATABASE=/data/database.sqlite`), `MAIL_MAILER=log`, *healthcheck* sur `/up`.
+  2. `php:8.3-cli` installe les extensions (`pdo_mysql`, `pdo_sqlite`, `bcmath`,
+     `zip`), Composer, le code et les assets, puis `composer install --no-dev`.
+- **`docker/entrypoint.sh`** — au démarrage du conteneur `app` : crée `.env` +
+  `APP_KEY`, reporte les variables de `docker-compose.yml` dans `.env`, **attend
+  que MySQL réponde**, lance `php artisan migrate --force` puis
+  `php artisan db:seed` (désactivable avec `SEED=false`), et démarre
+  `php artisan serve` sur `0.0.0.0:8000`.
+- `app` démarre après `db` (`depends_on: condition: service_healthy`).
 
 ```bash
-docker compose up --build      # http://localhost:8000  —  marc@example.com / password
+docker compose up --build      # app :8000 · phpMyAdmin :8081 · Mailpit :8025
 docker compose down -v         # arrêt + suppression de la base
 ```
 
-Le workflow local sans Docker (§4) reste inchangé.
+Comptes : `marc@example.com` / `password` (app), `admin@test.fr` / `password`
+(`/admin/login`). Le workflow local sans Docker (§4, SQLite) reste inchangé.
 
 ### 19.2 Déploiement PaaS
 

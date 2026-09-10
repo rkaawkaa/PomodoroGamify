@@ -1,4 +1,5 @@
 services:
+  # Application Laravel + front compilé
   app:
     build:
       context: .
@@ -11,18 +12,66 @@ services:
       APP_DEBUG: "true"
       APP_URL: http://localhost:8000
       APP_LOCALE: fr
-      DB_CONNECTION: sqlite
-      DB_DATABASE: /data/database.sqlite
-      MAIL_MAILER: log            # aucun envoi réel : les e-mails vont dans les logs
-      SEED: "true"                # mettre "false" pour ne pas rejouer le seeder au démarrage
-    volumes:
-      - db-data:/data             # persiste la base entre les redémarrages
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: pomobloom
+      DB_USERNAME: pomobloom
+      DB_PASSWORD: pomobloom
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: "1025"
+      SEED: "true"                # "false" pour ne pas rejouer le seeder au démarrage
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
     healthcheck:
       test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') ? 0 : 1);"]
       interval: 15s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 40s
+
+  # Base de données MySQL
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: pomobloom
+      MYSQL_USER: pomobloom
+      MYSQL_PASSWORD: pomobloom
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Interface web de la base : http://localhost:8081
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      PMA_USER: pomobloom
+      PMA_PASSWORD: pomobloom
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8081:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Capture des e-mails : http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
 
 volumes:
   db-data:
